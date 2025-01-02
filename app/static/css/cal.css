@@ -1,0 +1,31 @@
+/* Add this to your existing CSS or create a new cal.css file */
+
+#task-done-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#task-done-container img {
+    width: 100px;
+    height: 100px;
+}
+
+#task-done-container p {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+#task-done-container button {
+    padding: 10px;
+    font-size: 16px;
+}
+h3, p{
+
+    color: #ffd166; /* Light yellow text color for header */
+}
+
+img{
+  height: 300px;
+  width: 300px;
+
+}

@@ -1,0 +1,39 @@
+body {
+            margin: 0 auto;
+            max-width: 50em;
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+            line-height: 1.5;
+            padding: 1em;
+            text-align: center;
+            background-color: #6c63ff; /* Purple background */
+        }
+
+        h1 {
+            color: #ffd166; /* Light yellow heading color */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            border: 1px solid #ffd166; /* Light yellow border */
+            background-color: #6c63ff; /* Light yellow background */
+            color: #ffd166; /* Dark text color for better contrast */
+        }
+
+        th {
+            background-color: #6c63ff; /* Purple background for header */
+            color: #ffd166; /* Light yellow text color for header */
+        }
+
+        .done-icon {
+            cursor: pointer;
+        }
+
+        .done-icon:hover {
+            color: #ff6347; /* Tomato color on hover */
+        }
