@@ -1,27 +1,88 @@
-## Reminder App
 
-Emi is a simple web application who reminds people to do tasks and take breaks. 
+# Emi: Task Reminder App
+
+**Emi** is a simple yet effective web application designed to remind users to complete tasks and take breaks. Whether you need a nudge to stay on schedule or a gentle reminder to prioritize self-care, Emi has you covered.
+
+---
+
+## Table of Contents
+
+1. [How to Run](#how-to-run)
+2. [Features](#features)
+3. [Dependencies](#dependencies)
+4. [License](#license)
+5. [Contribution](#contribution)
+
+---
 
 ## How to Run
 
-1. **Clone the Repository:**
+Follow these steps to run the application locally:
+
+1. **Clone the Repository**:
+   ```bash
    git clone https://github.iu.edu/sajairam/emibot.git
    cd emibot
-2. **Install Dependencies:**
-  pip install -r requirements.txt
-3. **Run the Application:**
-  python main.py
-4. **Access the App:**
-  Open your web browser and go to http://127.0.0.1:5000/ to access the home page, or http://127.0.0.1:5000/cal for the calendar page.
+   ```
+
+2. **Install Dependencies**:
+   Use pip to install the required dependencies.
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the Application**:
+   Start the Flask server.
+   ```bash
+   python main.py
+   ```
+
+4. **Access the App**:
+   - **Home Page**: Open your web browser and navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
+   - **Calendar Page**: Access the calendar by visiting [http://127.0.0.1:5000/cal](http://127.0.0.1:5000/cal).
+
+---
 
 ## Features
 
-1. Home Page: Emi welcomes users to the Task Reminder app.
-2. Calendar Page: Displays a simple list of upcoming events/tasks.
-3. Reminders to take breaks every 30 mins
-4. Reminders to eat and go to sleep
-(For the purpose of the demo, reminder for break is called after 5 seconds, eat after 10 seconds and sleep after 15 seconds after the tasks page is loaded)
+1. **Home Page**:
+   - Emi warmly welcomes users to the Task Reminder app.
+   - Simple and intuitive UI for quick access to features.
+
+2. **Calendar Page**:
+   - Displays a list of upcoming events and tasks.
+   - Helps users organize their schedule effectively.
+
+3. **Smart Reminders**:
+   - **Break Reminders**: Emi reminds users to take breaks every 30 minutes (demo triggers break reminders after 5 seconds).
+   - **Eat and Sleep Reminders**:
+     - Reminder to eat is triggered 10 seconds after the tasks page is loaded (for demo purposes).
+     - Reminder to sleep is triggered 15 seconds after the tasks page is loaded (for demo purposes).
+
+4. **User-Centric Design**:
+   - Emi aims to enhance productivity while promoting well-being.
+
+---
 
 ## Dependencies
 
-Flask 2.0.1
+The application relies on the following library:
+
+- **Flask**: Version 2.0.1
+
+Install it and other dependencies using:
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Contribution
+
+Contributions are welcome! Whether you have suggestions for new features, bug fixes, or UI improvements, feel free to submit a pull request or open an issue.
+
+---
+
+## License
+
+This project is open-source and available under the [MIT License](LICENSE).
