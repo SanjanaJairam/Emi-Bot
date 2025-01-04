@@ -21,7 +21,7 @@ Follow these steps to run the application locally:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.iu.edu/sajairam/emibot.git
+   git clone https://github.com/SanjanaJairam/Emi-Bot.git
    cd emibot
    ```
 
