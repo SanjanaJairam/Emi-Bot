@@ -64,19 +64,6 @@ Follow these steps to run the application locally:
 
 ---
 
-## Dependencies
-
-The application relies on the following library:
-
-- **Flask**: Version 2.0.1
-
-Install it and other dependencies using:
-```bash
-pip install -r requirements.txt
-```
-
----
-
 ## Contribution
 
 Contributions are welcome! Whether you have suggestions for new features, bug fixes, or UI improvements, feel free to submit a pull request or open an issue.
