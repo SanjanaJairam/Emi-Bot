@@ -22,7 +22,7 @@ Follow these steps to run the application locally:
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/SanjanaJairam/Emi-Bot.git
-   cd emibot
+   cd Emi-Bot
    ```
 
 2. **Install Dependencies**:
