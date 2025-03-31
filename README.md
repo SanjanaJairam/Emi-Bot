@@ -1,7 +1,8 @@
-
 # Emi: Task Reminder App
 
 **Emi** is a simple yet effective web application designed to remind users to complete tasks and take breaks. Whether you need a nudge to stay on schedule or a gentle reminder to prioritize self-care, Emi has you covered.
+
+Check out the demo video here: [Emi: Task Reminder App Demo](https://youtu.be/Et_nOuvK6xc)
 
 ---
 
