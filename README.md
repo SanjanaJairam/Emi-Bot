@@ -5,7 +5,7 @@
 Check out the demo video here: 
 
 ![Emi: Task Reminder App Demo](https://i9.ytimg.com/vi_webp/Et_nOuvK6xc/mq1.webp?sqp=CNSLrL8G-oaymwEmCMACELQB8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGBUgWCh_MA8%3D&rs=AOn4CLBK0YXe77UicR-1NgmePVk3fDQdUA&retry=4)
-
+(https://youtu.be/Et_nOuvK6xc)
 
 ---
 
