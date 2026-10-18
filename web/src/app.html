@@ -74,6 +74,8 @@ button { cursor: pointer; }
 /* Stage */
 .stage { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .spot { position: relative; width: min(270px, 74vw); aspect-ratio: 1; max-width: 100%; }
+.spot.tappable { cursor: pointer; }
+.spot.tappable .spot-bg { box-shadow: 0 0 0 4px var(--butter); }
 .spot-bg { position: absolute; inset: 9%; border-radius: 50%; background: var(--accent-soft); }
 .ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring circle { fill: none; stroke-width: 9; }
@@ -199,7 +201,7 @@ dialog::backdrop { background: rgba(22, 18, 44, .45); }
   </div>
 
   <section class="stage" aria-label="Emi">
-    <div class="spot">
+    <div class="spot" id="spot">
       <div class="spot-bg"></div>
       <svg class="ring" id="ring" viewBox="0 0 300 300" aria-hidden="true" hidden>
         <circle class="track" cx="150" cy="150" r="140"/>
@@ -293,6 +295,10 @@ dialog::backdrop { background: rgba(22, 18, 44, .45); }
     </div>
     <div class="group" id="nudgeSet">
       <h3>Gentle nudges</h3>
+      <div class="seg" id="setRemind">
+        <button type="button" data-v="quiet">Quiet</button><button type="button" data-v="ask">Ask me</button><button type="button" data-v="between">Between sessions</button><button type="button" data-v="off">Off</button>
+      </div>
+      <div class="hint" id="remindHint"></div>
     </div>
     <div class="group">
       <h3>Comfort</h3>
@@ -364,7 +370,7 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const $ = id => document.getElementById(id);
 const DEFAULT = () => ({
   name: "", empathy: 1, energy: null, energyDate: "", onboard: 0,
-  demo: true, calm: false, sound: false, speak: false, size: "m", font: "atk",
+  demo: true, calm: false, sound: false, speak: false, size: "m", font: "atk", remind: "quiet",
   memories: [],
   tasks: [
     { id: uid(), title: "Build robot for HRI", done: false, later: false, example: true, steps: [] },
@@ -374,7 +380,7 @@ const DEFAULT = () => ({
   currentId: null,
   nudges: [
     { id: "water", label: "Sip some water", every: 45, on: true, last: Date.now() },
-    { id: "eyes", label: "Rest your eyes", every: 20, on: true, last: Date.now() },
+    { id: "eyes", label: "Rest your eyes", every: 20, on: false, last: Date.now() },
     { id: "move", label: "Stretch and move", every: 60, on: false, last: Date.now() },
   ],
   stars: {}, starsTotal: 0,
@@ -404,6 +410,7 @@ function setMood(m) {
 }
 let prompting = false;
 function say(text, mood, actions) {
+  if (quietNudge) endQuiet();
   $("bubble").textContent = text;
   if (mood) setMood(mood);
   const box = $("bubbleActions"); box.innerHTML = "";
@@ -459,6 +466,7 @@ function cycleTask() {
   S.currentId = list[(i + 1) % list.length].id; save(); renderNow();
 }
 
+const REMIND_OPTS = [["quiet", "Quiet", "Emi acts it out"], ["between", "Between", "Only after sessions"], ["off", "Off", "No reminders"]];
 const STEP_STYLE = {
   low: "Energy is LOW. Make 5 to 7 very tiny steps, each under 3 minutes, starting with something almost effortless (like 'open the file').",
   ok: "Energy is okay. Make 4 or 5 small steps, each under 10 minutes.",
@@ -518,8 +526,11 @@ function stopSession(early) {
   if (!s) return;
   if (s.kind === "focus") {
     chime();
+    const due = S.remind === "off" ? [] : dueNudges();
+    const extra = !early && due.length ? " " + pick(["Water and a stretch, too.", "Maybe have some water while you're up.", "While you rest, a sip of water might feel nice."]) : "";
+    due.forEach(n => n.last = Date.now());
     say(early ? pick(["Session stopped.", "Stopping is okay. You showed up.", "That's okay. Starting at all was the hard part, and you did it."])
-      : pick(["Time's up. Break?", `${s.len} minutes done! How about a break?`, `We did ${s.len} minutes together. I'm proud of you. Want a little break?`]),
+      : pick(["Time's up. Break?", `${s.len} minutes done! How about a break?`, `We did ${s.len} minutes together. I'm proud of you. Want a little break?`]) + extra,
       "happy", [{ label: "Take a 5 min break", fn: () => startBreak(5) }, { label: "Keep going", fn: startFocus }]);
   } else {
     chime();
@@ -537,13 +548,48 @@ const NUDGE = {
 };
 function addStar() { S.stars[today()] = (S.stars[today()] || 0) + 1; S.starsTotal++; save(); renderJar(); }
 function dueIn(n) { return n.last + n.every * unit() - Date.now(); }
-function fireNudge(n) {
+const pausedToday = n => n.pausedDay === today();
+const NUDGE_QUIET = { water: "Emi is sipping water. Tap her if you'd like to join.", eyes: "Emi is resting her eyes. Tap her to rest yours too.", move: "Emi is stretching. Tap her to stretch with her." };
+let quietNudge = null, quietTimer = null;
+function nudgeDone(n) {
+  n.last = Date.now(); n.skips = 0; addStar(); save();
+  say(pick(["+1 star.", "Yay, a star for your jar!", "That's a star for your cozy jar. Thank you for caring for yourself."]), "happy");
+  setTimeout(idleIfFree, 3500);
+}
+function nudgeSkip(n) {
+  n.skips = (n.skips || 0) + 1;
+  if (n.skips >= 2) {
+    n.pausedDay = today(); n.skips = 0; n.last = Date.now(); save();
+    say(pick([`${n.label}: off for today.`, `I'll stop asking about that for today. You can turn it back on in Settings.`, `That's okay. I won't ask about that again today. You're the one who knows what you need.`]), "idle");
+  } else {
+    n.last = Date.now() - (n.every - 10) * unit(); save();
+    say(pick(["Okay. 10 minutes.", "No worries! I'll ask again in a bit.", "That's completely fine. I'll check back later."]), "idle");
+  }
+}
+function askNudge(n) {
   chime();
   say(NUDGE[n.id].msg[S.empathy](), NUDGE[n.id].mood, [
-    { label: "Done", fn: () => { n.last = Date.now(); addStar(); save(); say(pick(["+1 star.", "Yay, a star for your jar!", "That's a star for your cozy jar. Thank you for caring for yourself."]), "happy"); setTimeout(idleIfFree, 3500); } },
-    { label: "Not now", fn: () => { n.last = Date.now() - (n.every - 10) * unit(); save(); say(pick(["Okay. 10 minutes.", "No worries! I'll ask again in a bit.", "That's completely fine. I'll check back later."]), "idle"); } },
+    { label: "Done", fn: () => nudgeDone(n) },
+    { label: "Not now", fn: () => nudgeSkip(n) },
   ]);
 }
+// Quiet style: Emi acts it out silently; nothing to answer unless you tap her.
+function quietAct(n) {
+  quietNudge = n; setMood(NUDGE[n.id].mood);
+  $("spot").classList.add("tappable");
+  $("spot").setAttribute("tabindex", "0"); $("spot").setAttribute("role", "button");
+  $("spot").setAttribute("aria-label", NUDGE_QUIET[n.id]);
+  clearTimeout(quietTimer);
+  quietTimer = setTimeout(() => { if (quietNudge === n) { n.last = Date.now(); save(); endQuiet(); idleIfFree(); } }, 25000);
+}
+function endQuiet() {
+  quietNudge = null; clearTimeout(quietTimer); $("spot").classList.remove("tappable");
+  ["tabindex", "role", "aria-label"].forEach(a => $("spot").removeAttribute(a));
+}
+function fireNudge(n) {
+  if (S.remind === "quiet") quietAct(n); else askNudge(n);
+}
+function dueNudges() { return S.nudges.filter(n => n.on && !pausedToday(n) && dueIn(n) <= 0); }
 function idleIfFree() { if (!prompting && !S.session) { setMood("idle"); $("bubble").textContent = restingLine(); } }
 function restingLine() {
   const t = current();
@@ -573,12 +619,18 @@ function tick() {
     $("quiet").textContent = s.kind === "focus" ? "Nudges are paused while we work." : "";
   } else {
     $("ring").setAttribute("hidden", "");
-    if (!prompting && S.onboard >= 3 && !document.hidden) {
-      const due = S.nudges.filter(n => n.on && dueIn(n) <= 0)[0];
+    const clock = S.remind === "ask" || S.remind === "quiet";
+    if (clock && !prompting && !quietNudge && S.onboard >= 3 && !document.hidden) {
+      const due = dueNudges()[0];
       if (due) fireNudge(due);
     }
-    const next = S.nudges.filter(n => n.on).sort((a, b) => dueIn(a) - dueIn(b))[0];
-    $("quiet").textContent = S.onboard < 3 ? "" : next ? `Next gentle nudge: ${next.label.toLowerCase()} in ${fmtRel(dueIn(next))}` : "Nudges are off.";
+    const next = S.nudges.filter(n => n.on && !pausedToday(n)).sort((a, b) => dueIn(a) - dueIn(b))[0];
+    $("quiet").textContent = S.onboard < 3 ? ""
+      : quietNudge ? NUDGE_QUIET[quietNudge.id]
+      : S.remind === "off" ? "Reminders are off. I'll still offer a break after we work together."
+      : S.remind === "between" ? "I'll only suggest breaks when a work session ends."
+      : next ? `Next gentle nudge: ${next.label.toLowerCase()} in ${fmtRel(dueIn(next))}`
+      : S.nudges.some(n => n.on && pausedToday(n)) ? "No more nudges today." : "Nudges are off.";
   }
 }
 
@@ -616,15 +668,25 @@ function renderNow() {
   }
   if (S.onboard === 1) {
     const opts = [["Just facts", "Short and direct"], ["Friendly", "Warm and brief"], ["Extra gentle", "Checks how you feel"]];
-    card.append(h("div", { class: "eyebrow" }, "Step 2 of 3"), h("div", { class: "task-title" }, "How should Emi talk to you?"),
-      h("div", { class: "choice" }, opts.map(([a, b], i) => h("button", { "aria-pressed": String(S.empathy === i), onclick: () => { S.empathy = i; S.onboard = 2; save(); say(pick(["Got it. Short and clear.", "Okay! Friendly and brief.", "I'll be gentle with you."]), "happy"); renderAll(); } }, a, h("small", {}, b)))),
+    card.append(h("div", { class: "eyebrow" }, "Step 2 of 4"), h("div", { class: "task-title" }, "How should Emi talk to you?"),
+      h("div", { class: "choice" }, opts.map(([a, b], i) => h("button", { "aria-pressed": String(S.empathy === i), onclick: () => { S.empathy = i; S.onboard = 2; S.remindAsked = false; save(); say(pick(["Got it. Short and clear.", "Okay! Friendly and brief.", "I'll be gentle with you."]), "happy"); renderAll(); } }, a, h("small", {}, b)))),
+      h("div", { class: "hint" }, "You can change this anytime in Settings."));
+    return;
+  }
+  if (S.onboard === 2 && S.remindAsked === false) {
+    const opts = REMIND_OPTS;
+    card.append(h("div", { class: "eyebrow" }, "Step 3 of 4"), h("div", { class: "task-title" }, "How should Emi remind you to take care of yourself?"),
+      h("div", { class: "choice" }, opts.map(([v, a, b]) => h("button", { "aria-pressed": String(S.remind === v), onclick: () => {
+        S.remind = v; S.remindAsked = true; save();
+        say({ quiet: "I'll just sip my water or stretch nearby. Tap me if you want to join.", between: "Okay. I'll only suggest breaks after we finish working.", off: "Okay, no reminders. I'm still here if you need me." }[v], v === "quiet" ? "sip" : "happy");
+        renderAll(); } }, a, h("small", {}, b)))),
       h("div", { class: "hint" }, "You can change this anytime in Settings."));
     return;
   }
   const needEnergy = S.onboard === 2 || S.energyDate !== today();
   if (needEnergy && !S.session) {
     const opts = [["low", "Low", "Tiny steps"], ["ok", "Okay", "Small steps"], ["good", "Good", "Bigger steps"]];
-    card.append(h("div", { class: "eyebrow" }, S.onboard === 2 ? "Step 3 of 3" : "Quick check-in"),
+    card.append(h("div", { class: "eyebrow" }, S.onboard === 2 ? "Step 4 of 4" : "Quick check-in"),
       h("div", { class: "task-title" }, "How's your energy right now?"),
       h("div", { class: "choice" }, opts.map(([v, a, b]) => h("button", { "aria-pressed": String(S.energy === v), onclick: () => setEnergy(v) }, a, h("small", {}, b)))),
       h("div", { class: "row" }, h("button", { class: "link-btn", onclick: () => setEnergy(S.energy || "ok", true) }, "Skip for today")));
@@ -861,7 +923,7 @@ function openSettings() {
     const mins = h("input", { type: "number", class: "field mins", id: "nmin-" + n.id, min: "5", max: "240", value: String(n.every), "aria-label": n.label + " every how many minutes" });
     g.append(h("div", { class: "set" }, h("label", { for: "nmin-" + n.id }, n.label, h("small", {}, "every … minutes")), h("div", { style: "display:flex;gap:10px;align-items:center" }, mins, sw)));
   });
-  paints = [segInit("setEmpathy", "empathy", Number), segInit("setSize", "size", String), segInit("setFont", "font", String)];
+  paints = [segInit("setRemind", "remind", String), segInit("setEmpathy", "empathy", Number), segInit("setSize", "size", String), segInit("setFont", "font", String)];
   const ml = $("memList"); ml.innerHTML = "";
   if (!S.memories.length) ml.append(h("li", {}, h("span", {}, "Nothing yet. When you share things in Talk, like your routine or what helps you, Emi saves them here.")));
   S.memories.forEach((m, i) => ml.append(h("li", {}, h("span", {}, m), h("button", { type: "button", class: "small-btn", onclick: () => { S.memories.splice(i, 1); save(); openSettings(); } }, "Forget"))));
@@ -887,11 +949,16 @@ $("resetYes").onclick = () => { S = DEFAULT(); save(); $("settings").close(); ap
 $("energyChip").onclick = () => { S.energyDate = ""; save(); switchTab("now"); renderAll(); say("How's your energy now?", "think"); };
 $("addForm").onsubmit = e => { e.preventDefault(); if (addTask($("addInput").value)) { $("addInput").value = ""; renderAll(); } };
 $("dumpBtn").onclick = brainDump;
+$("spot").onclick = () => { if (!quietNudge) return; const n = quietNudge; endQuiet(); askNudge(n); };
+$("spot").onkeydown = e => { if ((e.key === "Enter" || e.key === " ") && quietNudge) { e.preventDefault(); $("spot").click(); } };
 $("sendForm").onsubmit = e => { e.preventDefault(); const v = $("sendInput").value.trim(); if (v) { $("sendInput").value = ""; talk(v); } };
 $("talkChips").onclick = e => { const b = e.target.closest("button"); if (b) talk(b.dataset.say); };
 
+const REMIND_HINT = { quiet: "Emi acts out each nudge silently. Tap her to join in.", ask: "Emi asks you with a message and two buttons.", between: "Only suggests breaks when a work session ends.", off: "No nudges. Emi still offers a break after a session." };
 function applyPrefs() {
   const r = document.documentElement;
+  const rh = $("remindHint"); if (rh) rh.textContent = REMIND_HINT[S.remind] || "";
+  if (S.remind !== "quiet" && quietNudge) endQuiet();
   r.dataset.size = S.size; r.dataset.font = S.font; r.dataset.calm = S.calm ? "on" : "off";
 }
 function renderAll() {

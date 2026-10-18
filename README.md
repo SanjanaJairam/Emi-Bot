@@ -31,6 +31,13 @@ Many people who want a desk buddy have ADHD, autism or dyslexia, so Emi follows 
 - **Body doubling.** Emi reads beside you during a session, and a ring shows time passing.
 - **A 2-minute heads-up** before each session ends, to ease the transition.
 - **Where was I?** When you come back to the tab, Emi tells you which task and step you were on.
+- **Reminders that don't nag.** You choose a style during setup:
+  - **Quiet** (the default): Emi sips water or stretches silently, and you tap her if you want to join.
+  - **Ask me**: a message with two buttons.
+  - **Between sessions**: breaks are only suggested when a work session ends.
+  - **Off**.
+
+  If you tap "Not now" twice in a row, Emi stops asking about that nudge for the rest of the day.
 - **No guilt.** No streaks, no red, and "Not now" is always an option.
 - **Brain dump.** Type everything on your mind and Emi sorts it into today and later.
 - **"Make this step smaller"** for when a step still feels too big.
