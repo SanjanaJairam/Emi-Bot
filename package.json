@@ -1,0 +1,7 @@
+{
+  "name": "emi-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Emi, a calm desk-buddy companion. Static site in web/, optional Claude endpoint in api/.",
+  "license": "MIT"
+}
