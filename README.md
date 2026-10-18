@@ -69,8 +69,9 @@ web/src/
     main.js             wiring and start-up
   build.py            Joins everything into web/index.html
 api/chat.js           Serverless endpoint that calls Claude with your API key
-vercel.json           Tells Vercel to serve web/ and api/
-app/, main.py         Original v1 Flask prototype
+vercel.json           Tells Vercel to serve web/ (no build step) and api/
+.vercelignore         Keeps legacy/ and web/src/ out of deployments
+legacy/flask-v1/       Original v1 Flask prototype (not deployed)
 ```
 
 ## Default Scripted Functionality with Optional AI Integration
@@ -89,8 +90,10 @@ Without Smart help enabled, the application can be hosted as a static site (e.g.
 
 1. Get an API key from https://console.anthropic.com. (Only needed for Smart help.)
 2. Go to https://vercel.com, choose **Add New → Project**, and import this GitHub repo.
-3. Under **Environment Variables**, add `ANTHROPIC_API_KEY` with your key.
+3. Leave the settings as they are (`vercel.json` already sets the framework to Other and the output folder to `web`). For Smart help, add `ANTHROPIC_API_KEY` under **Environment Variables**; skip this for the scripted demo.
 4. Click **Deploy**. Vercel gives you a link like `emi-bot.vercel.app` to share.
+
+New visitors start with **demo speed** on (each minute runs as one second), which suits a quick demo. Anyone can switch it off in Settings.
 
 Every push to `main` redeploys automatically.
 
@@ -118,6 +121,7 @@ For Smart help, put `ANTHROPIC_API_KEY=...` in a `.env` file first. The `.gitign
 ### Running the original Flask v1
 
 ```bash
+cd legacy/flask-v1
 pip install -r requirements.txt
 python main.py
 ```
