@@ -1,129 +1,133 @@
-# Emi: An AI Desk Companion for Extended Work Sessions
+# Emi 🐱 — An AI Desk Companion
 
-Emi is a cat-inspired desk companion designed to assist students and academics in maintaining productivity while supporting personal well-being. Emi provides reminders to take breaks, hydrate, and rest the eyes. The system remains unobtrusive during periods of focus, decomposes large tasks into manageable steps, and monitors user well-being according to the preferred level of interaction.
+Emi is a little cat-inspired desk companion made to help students stay focused, manage their tasks, and remember to take care of themselves while working.
 
-Emi was developed as part of **Desk Buddy**, a human-robot interaction design research project (I540) led by Sanjana Jairam, Vivian, and Haoru. The research process included 11 interviews, an eight-participant survey, and observational studies of three commercial desk robots (Vector, Eilik, Emo).
+The idea was to create something that feels more like a companion than another productivity app. Emi can help you get started on assignments, break down overwhelming tasks, remind you to drink water or take a break, and quietly keep you company while you work.
 
-Original v1 demo video: https://youtu.be/Et_nOuvK6xc
+She's designed to be helpful without constantly interrupting you.
 
----
+**Try Emi:** [emi-bot.vercel.app](https://emi-bot.vercel.app)
+**Early prototype demo (v1):** [Watch here](https://youtu.be/Et_nOuvK6xc)
 
-## Translating Research Insights into Design
+<!-- Add a screenshot or GIF of Emi here, e.g. ![Emi](docs/emi.png) -->
 
-| What we found | How Emi responds |
-| --- | --- |
-| Task reminders (87.5%), scheduling and emotional support (75% each) were the top wanted benefits | A Today task list, a "Plan my next hour" conversation, and gentle check-ins |
-| Opinions on robot empathy and mood recognition split into thirds | A **"How Emi talks"** setting (Just facts, Friendly, Extra gentle) that changes both nudges and Emi's tone |
-| 50% said a robot would be unwelcome while concentrating or in meetings | **Working together** sessions pause every nudge while Emi quietly reads beside you |
-| Interviewees wanted gamification, but not rewards for finishing work | A **cozy jar** fills with stars for breaks, water and stretches only. Stars never go away, and there are no streaks to lose |
-| People wanted a robot that remembers them and feels like a friend | Emi saves small details you share and uses them later. You can view and delete them in Settings |
-| A subtle, embodied "walk with me" nudge beat a plain alert | Emi acts out each nudge herself: she sips from a mug, stretches, or rests her eyes |
-| Voice was the preferred input, and poor recognition frustrated users of existing robots | Optional spoken replies and voice input, with typing always available |
-| Writer's block and getting started were common pain points | "Help me start" and "Break it into tiny steps" turn a task into a first step that takes under 5 minutes |
+## About the Project
 
-## Design Considerations for Neurodivergent Users
+Emi started as part of **Desk Buddy**, a human-robot interaction design research project (I540) by Sanjana Jairam, Vivian, and Haoru.
 
-A significant proportion of individuals seeking a desk companion experience ADHD, autism, or dyslexia. Consequently, Emi incorporates calm-design principles inspired by applications such as Finch, Tiimo, and Goblin Tools, as well as guidance from the W3C's cognitive accessibility standards:
+We wanted to explore how a desk robot could support students during long work or study sessions without becoming another distraction.
 
-- **Single-task focus:** The main interface displays one task and its immediate next step, while additional features are accessible via separate tabs.
-- **Streamlined setup:** Users complete four steps to configure their name, Emi's communication style, their reminder style, and their current energy level.
-- **Energy check-in:** When users report low energy, Emi provides smaller task steps and shorter session durations (10, 15, or 25 minutes).
-- **Body doubling:** During work sessions, Emi remains present on screen, accompanied by a visual indicator that displays the passage of time.
-- **Transition support:** A two-minute notification is provided before each session concludes to facilitate a smooth transition.
-- **Session continuity:** Upon returning to the application, Emi informs users of their previous task and step.
-- **Non-intrusive reminders:** Users select their preferred reminder style during the setup process:
-  - **Quiet** (default): Emi performs silent actions such as sipping water or stretching, and users may choose to participate by tapping the character.
-  - **Ask me:** Emi displays a message accompanied by two response options.
-  - **Between sessions:** Break suggestions are provided exclusively at the conclusion of work sessions.
-  - **Off:** No reminders are shown.
+For our research, we conducted 11 interviews, surveyed 8 participants, and observed three existing desk robots: Vector, Eilik, and Emo.
 
-  Selecting "Not now" twice in a row pauses that reminder for the remainder of the day.
-- **No guilt-based features:** There are no streaks, no red indicators, and the "Not now" option remains consistently available.
-- **Brain dump:** Users may enter all current thoughts, which Emi then categorizes into tasks for today and for later.
-- **"Make this step smaller":** Available for instances when a task step remains overwhelming.
-- **User-controlled stimulation:** Calm mode disables motion, sound, and speech. Text size and the Lexend reading font are also adjustable.
+A few things stood out:
+- People wanted help with tasks, scheduling, and motivation. Task reminders were the most requested feature (87.5% of survey participants).
+- Not everyone wanted a robot checking in on their emotions. Opinions on emotional check-ins split roughly into thirds.
+- Interruptions during focused work were a big concern. Half of survey participants said a robot would be unwelcome while they were concentrating.
+- People liked the idea of a companion that could remember small things about them.
+- Getting started on a task was often harder than actually doing it.
 
-Emi is an original SVG character featuring eleven distinct moods: idle, wave, happy, love, sleepy, stretch, sip, eat, focus, think, and comfort. The character animates in response to user interaction, displays hearts upon task completion, and offers comfort when users are overwhelmed. Calm mode disables all character motion.
+These findings helped shape how Emi works.
 
----
+## What Emi Can Do
 
-## Project Structure Overview
+**Help you get started**
 
-```
-web/index.html        The Emi app: one self-contained page, generated by web/src/build.py
-web/src/
-  index.html          Page markup (template)
-  css/app.css         App styles: tokens, layout, components, dark mode
-  emi/                Emi herself: emi.svg.html (drawing) and emi.css (moods, animation)
-  js/                 App logic, one file per job:
-    util.js             small helpers
-    state.js            saved data and defaults
-    ai.js               connection to Claude (Smart help)
-    emi.js              Emi's face, speech bubble, voice and chime
-    tasks.js            tasks and steps
-    brain.js            built-in step templates and brain-dump sorting (no AI)
-    smart.js            task help that uses Claude, falling back to brain.js
-    sessions.js         working together, breaks and the time ring
-    nudges.js           self-care nudges and the cozy jar's stars
-    now.js / list.js / talk.js / settings.js   the screens
-    main.js             wiring and start-up
-  build.py            Joins everything into web/index.html
-api/chat.js           Serverless endpoint that calls Claude with your API key
-vercel.json           Tells Vercel to serve web/ and api/
-app/, main.py         Original v1 Flask prototype
-```
+Emi can break larger tasks into smaller steps, help you plan your next hour, or organize a brain dump when you have too much on your mind.
 
-## Default Scripted Functionality with Optional AI Integration
+**Keep you company while you work**
 
-Emi works fully without AI. Her built-in brain covers tap-to-reply conversations (help me start, overwhelmed, plan my next hour, how am I doing), step templates for common tasks (writing, email, reading, studying, coding, slides, cleaning, meetings) scaled to your energy, and brain-dump sorting. This keeps her predictable, instant, and private, and she can run on free static hosting.
+You can start a "Working together" session where Emi sits quietly beside you while you focus. Reminders are paused so you can work without interruptions.
 
-Enabling **Settings → Smart help** allows Claude to generate task-specific steps, intelligently sort brain dumps, and facilitate open-ended conversation. If the AI service is unavailable, Emi seamlessly reverts to her built-in functionality.
+**Remind you to take care of yourself**
 
-All AI requests go through a single function, `askClaude(prompt)` in `web/src/js/ai.js`. When the page runs on claude.ai, it communicates directly with Claude. On self-hosted sites, prompts are sent to `/api/chat`, ensuring the API key remains server-side. User data, including tasks, stars, and memories, is stored locally in the browser.
+Emi gives gentle reminders to drink water, stretch, rest your eyes, and take breaks. Instead of always sending a notification, she might just take a sip of water or stretch herself.
 
-Without Smart help enabled, the application can be hosted as a static site (e.g., GitHub Pages, Netlify, Vercel) without requiring an API key.
+**Adjust to your preferences**
 
----
+Not everyone wants the same kind of companion. You can change how Emi talks, how often she checks in, and whether she uses animations or sounds.
 
-## Deploy Your Own (Vercel, free tier)
+**Make breaks feel rewarding**
 
-1. Get an API key from https://console.anthropic.com. (Only needed for Smart help.)
-2. Go to https://vercel.com, choose **Add New → Project**, and import this GitHub repo.
-3. Under **Environment Variables**, add `ANTHROPIC_API_KEY` with your key.
-4. Click **Deploy**. Vercel gives you a link like `emi-bot.vercel.app` to share.
+Emi has a cozy jar that collects stars when you take care of yourself. There are no streaks to maintain or rewards to lose. The goal is to encourage breaks, not make productivity feel like another competition.
 
-Every push to `main` redeploys automatically.
+## Designing for Different Needs
 
-Optional: set `EMI_MODEL` to choose a different Claude model (the default is a fast, low-cost model).
+[After the course, I developed Emi into a working prototype.] One thing I wanted to be mindful of was making Emi comfortable for people who get overwhelmed easily, including neurodivergent users.
 
-## Editing the App
+I looked at apps like Finch, Tiimo, and Goblin Tools for inspiration, along with cognitive accessibility guidelines.
 
-Edit the files in `web/src/`, then rebuild the page:
+Some of the design choices include:
+
+- Showing one task and its next step instead of everything at once.
+- Breaking tasks into even smaller steps when needed.
+- Adjusting work sessions based on how much energy you have.
+- Letting users choose between quiet reminders, check-ins, or no reminders.
+- Keeping a "Not now" option without making users feel guilty.
+- Offering a calm mode that turns off movement, sound, and speech.
+
+Emi is meant to work around the user, rather than expecting the user to work a certain way.
+
+## How Emi Works
+
+Emi has a built-in system that works without AI. It handles common conversations, task breakdowns, work sessions, reminders, and brain-dump organization.
+
+There's also an optional **Smart help** setting that connects to Claude. When enabled, Emi can give more personalized task suggestions, organize thoughts, and respond to open-ended messages.
+
+If Smart help is off or unavailable, Emi still works using her built-in features.
+
+Tasks, preferences, stars, and saved memories are stored locally in the browser.
+
+### Built With
+
+- HTML, CSS, and JavaScript
+- SVG illustrations and CSS animations for Emi
+- Claude API for optional AI features
+- Vercel for deployment
+- Python build script to combine the app into one page
+
+Emi herself is an original SVG character with different expressions and animations. She can wave, stretch, sip water, look sleepy, celebrate with you, or just sit quietly while you work.
+
+## Project Structure
+
+The app is organized into a few main parts:
+
+- `web/src/` — Main app code, styles, and Emi's animations
+- `web/index.html` — Generated version of the app
+- `web/src/build.py` — Combines the source files into one page
+- `api/chat.js` — Handles requests to Claude
+- `legacy/flask-v1/` — Original Flask prototype (not deployed)
+
+## Running the Project
+
+Emi can run without an API key if you don't need Smart help.
+
+To rebuild the app after making changes:
 
 ```bash
 python3 web/src/build.py
 ```
 
-This regenerates `web/index.html`. If Node.js is installed, the build also checks the script for syntax errors. Commit both your changes and the rebuilt `web/index.html`.
-
-## Run Locally
+To run it locally with Vercel:
 
 ```bash
 npm i -g vercel
-vercel dev        # serves web/ and api/ at http://localhost:3000
+vercel dev
 ```
 
-For Smart help, put `ANTHROPIC_API_KEY=...` in a `.env` file first. The `.gitignore` excludes it. Without a key, everything except Smart help works as usual.
+Then open `http://localhost:3000`.
 
-### Running the original Flask v1
+### Enabling Smart Help
 
-```bash
-pip install -r requirements.txt
-python main.py
-```
+If you want to use Claude:
 
----
+1. Get an API key from [Anthropic](https://console.anthropic.com).
+2. Add `ANTHROPIC_API_KEY` to your local `.env` file or Vercel environment variables.
+3. Enable **Smart help** in Emi's settings.
+
+The API key stays on the server and isn't exposed in the browser.
+
+You can also deploy the project through [Vercel](https://vercel.com) by importing the GitHub repository.
 
 ## License
 
-Open source under the [MIT License](LICENSE).
+This project is open source under the [MIT License](https://github.com/SanjanaJairam/Emi-Bot/blob/main/LICENSE).
