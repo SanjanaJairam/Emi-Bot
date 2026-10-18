@@ -1,4 +1,5 @@
 {
   "buildCommand": "",
-  "outputDirectory": "web"
+  "outputDirectory": "web",
+  "installCommand": ""
 }
