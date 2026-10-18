@@ -43,7 +43,7 @@ Many people who want a desk buddy have ADHD, autism or dyslexia, so Emi follows 
 - **"Make this step smaller"** for when a step still feels too big.
 - **You control the stimulation.** Calm mode turns off motion, sound and speech. You can also change the text size and switch to the Lexend reading font.
 
-Emi herself is an original character drawn in SVG, with eight moods: idle, wave, happy, sleepy, stretch, sip, focus and think.
+Emi herself is an original character drawn in SVG, with eleven moods: idle, wave, happy, love, sleepy, stretch, sip, eat, focus, think and comfort. She wiggles when you tap her, shows hearts when you finish a step, and holds a heart for you when you're overwhelmed. Calm mode keeps her still.
 
 ---
 

@@ -1,7 +1,7 @@
 <title>Emi Desk Buddy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=Lexend:wght@400;600&display=swap">
 <style>
 /* Layout: one calm column. Emi in the middle, one "right now" card below, everything else one tab away. */
 :root {
@@ -23,8 +23,10 @@
   --cat-stripe: #EBC77F;
   --cat-cheek: #F2B9CF;
   --cat-shadow: rgba(74, 58, 94, .12);
-  --display: "Grandstander", "Trebuchet MS", system-ui, sans-serif;
-  --body: "Atkinson Hyperlegible", "Trebuchet MS", system-ui, sans-serif;
+  --display: "Fredoka", ui-rounded, "SF Pro Rounded", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Nunito", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --shadow: 0 1px 2px rgba(42, 33, 80, .05), 0 10px 28px rgba(42, 33, 80, .07);
+  --shadow-btn: 0 6px 16px rgba(91, 79, 224, .26);
   --read: var(--body);
   font-size: 17px;
 }
@@ -33,7 +35,7 @@
     --bg: #16122C; --surface: #211B40; --line: #352E5E; --ink: #F0ECFF; --muted: #A8A0D0;
     --accent: #A39AFF; --accent-ink: #16122C; --accent-soft: #2B2552;
     --butter-soft: #3A3122; --butter-ink: #FFE7A6; --good: #4CC79F;
-    --cat-shadow: rgba(0, 0, 0, .35);
+    --cat-shadow: rgba(0, 0, 0, .35); --shadow: 0 0 0 1px #2E2756, 0 10px 28px rgba(0, 0, 0, .3); --shadow-btn: 0 6px 16px rgba(0, 0, 0, .35);
     color-scheme: dark;
   }
 }
@@ -41,7 +43,7 @@
   --bg: #16122C; --surface: #211B40; --line: #352E5E; --ink: #F0ECFF; --muted: #A8A0D0;
   --accent: #A39AFF; --accent-ink: #16122C; --accent-soft: #2B2552;
   --butter-soft: #3A3122; --butter-ink: #FFE7A6; --good: #4CC79F;
-  --cat-shadow: rgba(0, 0, 0, .35);
+  --cat-shadow: rgba(0, 0, 0, .35); --shadow: 0 0 0 1px #2E2756, 0 10px 28px rgba(0, 0, 0, .3); --shadow-btn: 0 6px 16px rgba(0, 0, 0, .35);
   color-scheme: dark;
 }
 :root[data-size="s"] { font-size: 15px; }
@@ -74,6 +76,7 @@ button { cursor: pointer; }
 /* Stage */
 .stage { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .spot { position: relative; width: min(270px, 74vw); aspect-ratio: 1; max-width: 100%; }
+.spot { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .spot.tappable { cursor: pointer; }
 .spot.tappable .spot-bg { box-shadow: 0 0 0 4px var(--butter); }
 .spot-bg { position: absolute; inset: 9%; border-radius: 50%; background: var(--accent-soft); }
@@ -181,21 +184,120 @@ dialog::backdrop { background: rgba(22, 18, 44, .45); }
 .mem li { display: flex; justify-content: space-between; gap: 8px; align-items: center; background: var(--bg); border-radius: 12px; padding: 6px 6px 6px 12px; font-size: .9rem; }
 .mem li span { min-width: 0; overflow-wrap: anywhere; }
 
-:root[data-calm="on"] .emi *, :root[data-calm="on"] .typing i { animation: none !important; }
+:root[data-calm="on"] .emi, :root[data-calm="on"] .emi *, :root[data-calm="on"] .typing i { animation: none !important; }
 :root[data-calm="on"] .ring .prog { transition: none; }
 @media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+
+
+/* ===== Polish layer: rounder type, roomier spacing, soft app cards ===== */
+body { line-height: 1.6; padding-block: 18px calc(118px + env(safe-area-inset-bottom, 0px)); -webkit-font-smoothing: antialiased; }
+.app { gap: 20px; }
+h1, h2, h3, .task-title, .timer { font-family: var(--display); }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark { width: 40px; height: 40px; flex: none; }
+.brand h1 { font-size: 1.55rem; font-weight: 600; line-height: 1; color: var(--ink); letter-spacing: -.01em; }
+.brand-sub { display: block; font-size: .68rem; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: var(--accent); margin-top: 3px; }
+.chip-btn { border: 0; background: var(--surface); box-shadow: var(--shadow); font-family: var(--display); font-weight: 500; font-size: .86rem; padding: 8px 14px; min-height: 40px; }
+.chip-btn:hover { box-shadow: var(--shadow), 0 0 0 2px var(--accent-soft); }
+
+.stage { gap: 14px; padding-top: 4px; }
+.spot-bg { background: radial-gradient(circle at 50% 40%, var(--surface) 0%, var(--accent-soft) 70%); }
+.bubble { border: 0; box-shadow: var(--shadow); border-radius: 26px; padding: 14px 22px; font-size: 1.04rem; font-weight: 600; line-height: 1.45; }
+.bubble::before { border: 0; box-shadow: -3px -3px 6px rgba(42, 33, 80, .03); }
+.bubble-actions { gap: 10px; }
+.bubble-actions:empty { display: none; }
+.quiet { min-height: 0; background: var(--accent-soft); color: var(--muted); border-radius: 999px; padding: 5px 14px; font-size: .8rem; font-weight: 700; }
+.quiet:empty { display: none; }
+
+.card { border: 0; box-shadow: var(--shadow); border-radius: 28px; padding: 24px; gap: 16px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-weight: 800; font-size: .7rem; letter-spacing: 1.5px; }
+.eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--butter); box-shadow: 0 0 0 3px var(--butter-soft); }
+.task-title { font-weight: 600; font-size: 1.5rem; line-height: 1.22; letter-spacing: -.01em; }
+.timer { font-weight: 600; font-size: 2.6rem; letter-spacing: -.02em; }
+.hint { line-height: 1.5; }
+
+.btn { border-radius: 999px; font-family: var(--display); font-weight: 500; font-size: 1.02rem; min-height: 52px; padding: 12px 22px; transition: transform .12s ease, box-shadow .12s ease; }
+.btn:not(.soft):not(.butter) { box-shadow: var(--shadow-btn); }
+.btn.butter { box-shadow: 0 6px 16px rgba(230, 170, 40, .28); }
+.btn:active:not(:disabled), .chip-btn:active, .small-btn:active, .choice button:active { transform: scale(.97); }
+.link-btn { font-weight: 700; font-size: .88rem; color: var(--accent); text-decoration-thickness: 1.5px; text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.row { gap: 12px; }
+
+.step-box { border-radius: 20px; padding: 16px 18px; gap: 14px; align-items: center; }
+.step-box .lbl { margin-bottom: 2px; letter-spacing: 1.3px; }
+.step-box .txt { font-weight: 600; }
+
+/* round, friendly checkboxes */
+.step-box input[type=checkbox], .task > input[type=checkbox], .steps input[type=checkbox] {
+  appearance: none; -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; margin: 0; flex: none; cursor: pointer;
+  border: 2.5px solid color-mix(in srgb, var(--good) 55%, var(--line)); background: var(--surface); display: grid; place-items: center;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.step-box input[type=checkbox]:hover, .task > input[type=checkbox]:hover { transform: scale(1.06); }
+.step-box input[type=checkbox]:checked, .task > input[type=checkbox]:checked { background: var(--good); border-color: var(--good); }
+.step-box input[type=checkbox]:checked::after, .task > input[type=checkbox]:checked::after {
+  content: ""; width: 12px; height: 7px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; transform: translateY(-2px) rotate(-45deg); border-radius: 1px;
+}
+
+.field { border-radius: 16px; border-color: transparent; background: var(--bg); min-height: 52px; padding: 12px 16px; transition: border-color .15s, box-shadow .15s; }
+.field:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.choice { gap: 10px; }
+.choice button { border: 2px solid transparent; background: var(--bg); border-radius: 20px; padding: 14px 6px; min-height: 76px; font-family: var(--display); font-weight: 500; font-size: 1.02rem; gap: 4px; transition: transform .12s, border-color .15s; }
+.choice button small { font-family: var(--body); font-weight: 600; }
+.choice button:hover { border-color: var(--accent-soft); }
+.choice button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+
+.task { padding: 14px 0; gap: 14px; }
+.task .t { font-weight: 600; }
+.small-btn { border: 0; background: var(--bg); border-radius: 999px; padding: 7px 14px; font-weight: 700; min-height: 38px; }
+.small-btn:hover { background: var(--accent-soft); }
+.tag { border-radius: 999px; padding: 2px 8px; }
+details summary { font-family: var(--display); font-weight: 500; }
+.msg { border-radius: 20px; padding: 11px 16px; }
+
+/* floating tab bar */
+.tabs { background: transparent; border-top: 0; padding-top: 0; pointer-events: none; }
+.tabs-in { pointer-events: auto; max-width: 400px; background: var(--surface); box-shadow: var(--shadow), 0 -2px 20px rgba(42, 33, 80, .05); border-radius: 26px; padding: 6px; gap: 4px; }
+.tab { border-radius: 20px; font-family: var(--display); font-weight: 500; font-size: .82rem; min-height: 56px; transition: background .15s, color .15s; }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+
+dialog { border: 0; border-radius: 28px; box-shadow: 0 20px 60px rgba(22, 18, 44, .3); }
+.dlg { padding: 26px; gap: 22px; }
+.group h3 { font-family: var(--body); font-weight: 800; color: var(--accent); }
+.seg { gap: 6px; background: var(--bg); padding: 4px; border-radius: 999px; }
+.seg button { border: 0; background: transparent; border-radius: 999px; font-family: var(--display); font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--surface); box-shadow: 0 2px 8px rgba(42, 33, 80, .12); color: var(--accent); }
+.mem li { border-radius: 14px; }
+.brand-sub, .chip-btn { white-space: nowrap; }
+.spot { width: min(232px, 60vw); }
+.stage { gap: 12px; }
+@media (max-width: 420px) {
+  .card { padding: 20px; border-radius: 24px; } .task-title { font-size: 1.35rem; }
+  .settings-label { display: none; }
+  #settingsBtn { padding: 8px 11px; }
+}
 
 /*EMI_CSS*/
 </style>
 
 <div class="app">
   <div class="top">
-    <h1>Emi</h1>
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M9 17 L9 7 L17 12 Z M31 17 L31 7 L23 12 Z" fill="#FFF4DA" stroke="#4A3A5E" stroke-width="2.2" stroke-linejoin="round"/>
+        <ellipse cx="20" cy="23" rx="15" ry="12.5" fill="#FFF4DA" stroke="#4A3A5E" stroke-width="2.2"/>
+        <ellipse cx="15" cy="23" rx="2" ry="2.5" fill="#4A3A5E"/><ellipse cx="25" cy="23" rx="2" ry="2.5" fill="#4A3A5E"/>
+        <ellipse cx="11.5" cy="27" rx="2.4" ry="1.5" fill="#F2B9CF"/><ellipse cx="28.5" cy="27" rx="2.4" ry="1.5" fill="#F2B9CF"/>
+        <path d="M18 27 q1 1.4 2 0 q1 1.4 2 0" fill="none" stroke="#4A3A5E" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="21" cy="5" r="2.6" fill="#FFD166" stroke="#4A3A5E" stroke-width="1.6"/>
+      </svg>
+      <div><h1>emi</h1><span class="brand-sub">desk buddy</span></div>
+    </div>
     <div class="top-right">
       <button class="chip-btn" id="energyChip" title="Change how your energy is today" hidden></button>
       <button class="chip-btn" id="settingsBtn" aria-label="Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
-        Settings
+        <span class="settings-label">Settings</span>
       </button>
     </div>
   </div>
@@ -229,7 +331,7 @@ dialog::backdrop { background: rgba(22, 18, 44, .45); }
         <button class="btn" type="submit">Add</button>
       </form>
       <details id="dump">
-        <summary>Brain dump: type everything, Emi sorts it</summary>
+        <summary>Brain dump: Emi sorts it for you</summary>
         <div class="group">
           <label class="sr" for="dumpInput">Everything on your mind</label>
           <textarea class="field" id="dumpInput" placeholder="email prof about meeting, laundry, finish slides for thursday, need to eat something…"></textarea>
@@ -382,6 +484,7 @@ const DEFAULT = () => ({
     { id: "water", label: "Sip some water", every: 45, on: true, last: Date.now() },
     { id: "eyes", label: "Rest your eyes", every: 20, on: false, last: Date.now() },
     { id: "move", label: "Stretch and move", every: 60, on: false, last: Date.now() },
+    { id: "snack", label: "Eat something", every: 180, on: false, last: Date.now() },
   ],
   stars: {}, starsTotal: 0,
   chat: [], session: null,
@@ -390,7 +493,11 @@ let S = load();
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return Object.assign(DEFAULT(), JSON.parse(raw));
+    if (raw) {
+      const st = Object.assign(DEFAULT(), JSON.parse(raw));
+      DEFAULT().nudges.forEach(d => { if (!st.nudges.some(n => n.id === d.id)) st.nudges.push(d); });
+      return st;
+    }
   } catch {}
   return DEFAULT();
 }
@@ -405,7 +512,8 @@ function setMood(m) {
   emi.dataset.mood = m;
   emi.querySelectorAll("[data-m]").forEach(el => el.toggleAttribute("hidden", !el.dataset.m.split(" ").includes(m)));
   const labels = { idle: "Emi the cat, sitting with you", wave: "Emi waving hello", happy: "Emi smiling happily", sleepy: "Emi resting her eyes",
-    stretch: "Emi stretching", sip: "Emi sipping from a mug", focus: "Emi reading a book beside you", think: "Emi thinking" };
+    stretch: "Emi stretching", sip: "Emi sipping from a mug", focus: "Emi reading a book beside you", think: "Emi thinking",
+    love: "Emi happy, with little hearts", eat: "Emi slurping noodles", comfort: "Emi holding a heart for you" };
   emi.setAttribute("aria-label", labels[m] || labels.idle);
 }
 let prompting = false;
@@ -544,12 +652,13 @@ function stopSession(early) {
 const NUDGE = {
   water: { mood: "sip", msg: [() => "Water.", () => "Sip check! I'm having some too.", () => `Let's both have a sip of water, ${who()}. Small things count.`] },
   eyes: { mood: "sleepy", msg: [() => "Look far away for 20 seconds.", () => "Let's rest our eyes. Look at something far away for 20 seconds.", () => "Your eyes work hard. Let them soften on something far away for 20 seconds with me."] },
+  snack: { mood: "eat", msg: [() => "Eat something.", () => "Snack time! I'm having noodles. What about you?", () => `Your brain runs on food, ${who()}. Let's both have a little something to eat.`] },
   move: { mood: "stretch", msg: [() => "Stand up and stretch.", () => "Stretch with me! Arms up, big reach.", () => `Your body might like a little stretch, ${who()}. Reach up with me.`] },
 };
 function addStar() { S.stars[today()] = (S.stars[today()] || 0) + 1; S.starsTotal++; save(); renderJar(); }
 function dueIn(n) { return n.last + n.every * unit() - Date.now(); }
 const pausedToday = n => n.pausedDay === today();
-const NUDGE_QUIET = { water: "Emi is sipping water. Tap her if you'd like to join.", eyes: "Emi is resting her eyes. Tap her to rest yours too.", move: "Emi is stretching. Tap her to stretch with her." };
+const NUDGE_QUIET = { snack: "Emi is having a snack. Tap her if you're hungry too.", water: "Emi is sipping water. Tap her if you'd like to join.", eyes: "Emi is resting her eyes. Tap her to rest yours too.", move: "Emi is stretching. Tap her to stretch with her." };
 let quietNudge = null, quietTimer = null;
 function nudgeDone(n) {
   n.last = Date.now(); n.skips = 0; addStar(); save();
@@ -600,10 +709,7 @@ function restingLine() {
 const CIRC = 2 * Math.PI * 140;
 $("ringProg").style.strokeDasharray = CIRC;
 function fmtClock(ms) { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
-function fmtRel(ms) {
-  if (S.demo) return Math.max(1, Math.ceil(ms / 1000)) + " sec";
-  const m = Math.max(1, Math.ceil(ms / 60000)); return m + " min";
-}
+function fmtRel(ms) { return Math.max(1, Math.ceil(ms / unit())) + " min"; }
 function tick() {
   const s = S.session;
   if (s) {
@@ -739,7 +845,7 @@ function stepBox(t, st, canShrink) {
   cb.onchange = () => {
     st.done = true; save();
     const next = nextStep(t);
-    say(next ? pick(["Next step.", "Yes! On to the next tiny step.", "Lovely. One step at a time, just like that."]) : pick(["All steps done.", "That was the last step!", "That was the last step. You did all of it."]), "happy");
+    say(next ? pick(["Next step.", "Yes! On to the next tiny step.", "Lovely. One step at a time, just like that."]) : pick(["All steps done.", "That was the last step!", "That was the last step. You did all of it."]), "love");
     setTimeout(idleIfFree, 3000);
     renderNow(); renderList();
   };
@@ -834,14 +940,15 @@ ${hist || "(new)"}
 ${extra || ""}
 
 Reply with ONLY a JSON object:
-{"reply": "what Emi says", "mood": "idle|wave|happy|sleepy|stretch|sip|focus|think", "remember": ["a short helpful fact they shared about themselves, if any"], "add_tasks": ["only tasks they asked you to add"], "suggest": "focus|break|none"}`;
+{"reply": "what Emi says", "mood": "idle|wave|happy|love|sleepy|stretch|sip|eat|focus|think|comfort (use comfort when they feel sad, stressed or overwhelmed)", "remember": ["a short helpful fact they shared about themselves, if any"], "add_tasks": ["only tasks they asked you to add"], "suggest": "focus|break|none"}`;
 }
 let busy = false;
 async function talk(text, extra) {
   if (busy) return; busy = true; setBusy(true);
   if (text) { S.chat.push({ role: "user", text }); addMsg("me", text); save(); }
   const t = addMsg("emi-m", ""); t.innerHTML = `<span class="typing" aria-label="Emi is thinking"><i></i><i></i><i></i></span>`;
-  if (!prompting) setMood("think");
+  const heavy = text && /overwhelm|stress|anxious|sad|cry|tired|exhausted|can't do|cant do|hate myself|burn(ed|t)? out/i.test(text);
+  if (!prompting) setMood(heavy ? "comfort" : "think");
   try {
     const r = parseJSON(await askEmi(buildPrompt(extra)));
     const reply = String(r.reply || "").trim() || "Could you say that another way?";
@@ -949,7 +1056,17 @@ $("resetYes").onclick = () => { S = DEFAULT(); save(); $("settings").close(); ap
 $("energyChip").onclick = () => { S.energyDate = ""; save(); switchTab("now"); renderAll(); say("How's your energy now?", "think"); };
 $("addForm").onsubmit = e => { e.preventDefault(); if (addTask($("addInput").value)) { $("addInput").value = ""; renderAll(); } };
 $("dumpBtn").onclick = brainDump;
-$("spot").onclick = () => { if (!quietNudge) return; const n = quietNudge; endQuiet(); askNudge(n); };
+const TAP_LINES = [["Hi.", "I'm here.", "Ready when you are."], ["Hehe, hi!", "Boop!", "I'm right here with you.", "That tickles!"], ["Hi friend. I'm right here.", "I'm happy you're here.", "You're doing better than you think.", "Take your time. I'll wait with you."]];
+let lastTap = 0;
+$("spot").onclick = () => {
+  if (quietNudge) { const n = quietNudge; endQuiet(); askNudge(n); return; }
+  if (Date.now() - lastTap < 1500) return; lastTap = Date.now();
+  emi.classList.remove("wiggle"); void emi.getBBox(); emi.classList.add("wiggle");
+  setTimeout(() => emi.classList.remove("wiggle"), 650);
+  if (!prompting && !S.session && S.onboard >= 3) {
+    const lines = TAP_LINES[S.empathy]; $("bubble").textContent = lines[Math.floor(Math.random() * lines.length)];
+  }
+};
 $("spot").onkeydown = e => { if ((e.key === "Enter" || e.key === " ") && quietNudge) { e.preventDefault(); $("spot").click(); } };
 $("sendForm").onsubmit = e => { e.preventDefault(); const v = $("sendInput").value.trim(); if (v) { $("sendInput").value = ""; talk(v); } };
 $("talkChips").onclick = e => { const b = e.target.closest("button"); if (b) talk(b.dataset.say); };
@@ -964,7 +1081,7 @@ function applyPrefs() {
 function renderAll() {
   const ec = $("energyChip");
   ec.hidden = !(S.onboard >= 3 && S.energy);
-  ec.textContent = "Energy: " + ({ low: "low", ok: "okay", good: "good" }[S.energy] || "");
+  ec.textContent = "Energy · " + ({ low: "low", ok: "okay", good: "good" }[S.energy] || "");
   renderNow(); renderList(); renderJar(); tick();
 }
 function greet() {
