@@ -1,0 +1,55 @@
+/* Emi character */
+.emi { width: 100%; height: auto; overflow: visible; display: block; }
+.emi [hidden] { display: none; }
+.emi .fur { fill: var(--cat-fur); }
+.emi .line { stroke: var(--cat-line); stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+.emi .nofill { fill: none; }
+.emi .ear { fill: var(--cat-ear); }
+.emi .stripe { stroke: var(--cat-stripe); stroke-width: 4.5; stroke-linecap: round; fill: none; }
+.emi .cheek { fill: var(--cat-cheek); opacity: .75; }
+.emi .ink { fill: var(--cat-line); }
+.emi .shine { fill: #FFFFFF; }
+.emi .ink-line { stroke: var(--cat-line); stroke-width: 4.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.emi .ink-line.thin { stroke-width: 3.5; }
+.emi .nose { fill: var(--cat-line); }
+.emi .mouth { fill: var(--cat-line); }
+.emi .tongue { fill: var(--cat-cheek); }
+.emi .shadow { fill: var(--cat-shadow); }
+.emi .stem { stroke: var(--cat-line); stroke-width: 4; fill: none; stroke-linecap: round; }
+.emi .bulb { fill: #FFD166; stroke: var(--cat-line); stroke-width: 3; }
+.emi .bean { stroke: var(--cat-cheek); stroke-width: 5; stroke-linecap: round; }
+.emi .mug { fill: var(--cat-ear); }
+.emi .mug-band { stroke: #FFFFFF; stroke-width: 4; opacity: .7; }
+.emi .steam { stroke: var(--cat-line); stroke-width: 3; fill: none; stroke-linecap: round; opacity: .35; }
+.emi .book { fill: #FFFFFF; }
+.emi .book-lines { stroke: var(--cat-ear); stroke-width: 3; fill: none; stroke-linecap: round; }
+.emi .zzz text { font-family: var(--display); font-weight: 800; fill: var(--cat-line); opacity: .6; }
+.emi .zzz text:nth-child(1) { font-size: 18px; } .emi .zzz text:nth-child(2) { font-size: 22px; } .emi .zzz text:nth-child(3) { font-size: 26px; }
+.emi .sparkles path { fill: #FFD166; stroke: var(--cat-line); stroke-width: 2; stroke-linejoin: round; }
+.emi .dots circle { fill: var(--cat-fur); stroke: var(--cat-line); stroke-width: 3; }
+
+/* motion */
+.emi .bodyg { transform-origin: 120px 210px; animation: emi-breathe 4.5s ease-in-out infinite; }
+.emi .blink { transform-box: fill-box; transform-origin: center; animation: emi-blink 5.5s infinite; }
+.emi .halo { animation: emi-glow 2.8s ease-in-out infinite; }
+.emi[data-mood="happy"] .bodyg { animation: emi-hop 1.4s ease-in-out infinite; }
+.emi[data-mood="stretch"] .bodyg { animation: emi-stretch 3s ease-in-out infinite; }
+.emi[data-mood="think"] .eyes { transform: translateY(-4px); }
+.emi[data-mood="think"] .halo { animation-duration: .9s; }
+.emi[data-mood="sleepy"] .bodyg { animation-duration: 6.5s; }
+.emi .wavepaw { transform-origin: 188px 140px; animation: emi-wave 1.1s ease-in-out infinite; }
+.emi .zzz text { animation: emi-float 3s ease-in-out infinite; }
+.emi .zzz text:nth-child(2) { animation-delay: .5s; } .emi .zzz text:nth-child(3) { animation-delay: 1s; }
+.emi .steam { animation: emi-steam 2.6s ease-in-out infinite; }
+.emi .sparkles path { transform-box: fill-box; transform-origin: center; animation: emi-twinkle 1.6s ease-in-out infinite; }
+.emi .sparkles path:nth-child(2) { animation-delay: .4s; } .emi .sparkles path:nth-child(3) { animation-delay: .8s; }
+@keyframes emi-breathe { 50% { transform: scale(1.018, .982); } }
+@keyframes emi-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@keyframes emi-glow { 50% { opacity: .35; } }
+@keyframes emi-hop { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-9px) scale(.99, 1.02); } 55% { transform: translateY(0) scale(1.03, .97); } }
+@keyframes emi-stretch { 50% { transform: scale(.97, 1.07); } }
+@keyframes emi-wave { 50% { transform: rotate(-18deg); } }
+@keyframes emi-float { 50% { transform: translateY(-5px); opacity: .25; } }
+@keyframes emi-steam { 50% { opacity: .1; transform: translateY(-3px); } }
+@keyframes emi-twinkle { 50% { transform: scale(.7); } }
+@media (prefers-reduced-motion: reduce) { .emi * { animation: none !important; } }

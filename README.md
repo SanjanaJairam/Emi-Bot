@@ -1,80 +1,90 @@
-# Emi: Task Reminder App
+# Emi: an AI desk buddy for long hours at the desk
 
-**Emi** is a simple yet effective web application designed to remind users to complete tasks and take breaks. Whether you need a nudge to stay on schedule or a gentle reminder to prioritize self-care, Emi has you covered.
+**Emi** is a cat desk-buddy that helps students and academics get work done while looking after themselves. Emi reminds you to take breaks, drink water and rest your eyes. It stays quiet while you focus, breaks big tasks into small steps, and checks in on how you're feeling, at whatever level of warmth you choose.
 
-Check out the demo video here: 
+Emi comes out of **Desk Buddy**, a human-robot interaction design research project (I540) by Sanjana Jairam, Vivian and Haoru. We ran 11 interviews, an 8-person survey, and observation studies of three commercial desk robots (Vector, Eilik, Emo).
 
-![Emi: Task Reminder App Demo](https://i9.ytimg.com/vi_webp/Et_nOuvK6xc/mq1.webp?sqp=CNSLrL8G-oaymwEmCMACELQB8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGBUgWCh_MA8%3D&rs=AOn4CLBK0YXe77UicR-1NgmePVk3fDQdUA&retry=4)
-
-Click here: https://youtu.be/Et_nOuvK6xc
+Original v1 demo video: https://youtu.be/Et_nOuvK6xc
 
 ---
 
-## Table of Contents
+## From research to design
 
-1. [How to Run](#how-to-run)
-2. [Features](#features)
-3. [Dependencies](#dependencies)
-4. [License](#license)
-5. [Contribution](#contribution)
+| What we found | How Emi responds |
+| --- | --- |
+| Task reminders (87.5%), scheduling and emotional support (75% each) were the top wanted benefits | Today task list, an AI "plan my next hour" helper, and AI check-ins |
+| Opinions on robot empathy and mood recognition split into thirds | A **"How Emi talks"** setting (Just facts, Friendly, Extra gentle) that changes both nudges and the AI's tone |
+| 50% said a robot would be unwelcome while concentrating or in meetings | **Working together** sessions pause every nudge while Emi quietly reads beside you |
+| Interviewees wanted gamification, but not rewards for finishing work | A **cozy jar** fills with stars for breaks, water and stretches only. Stars never go away, and there are no streaks to lose |
+| People wanted a robot that remembers them and feels like a friend | Emi saves small details you share and uses them later. You can view and delete them in Settings |
+| A subtle, embodied "walk with me" nudge beat a plain alert | Emi acts out each nudge herself: she sips from a mug, stretches, or rests her eyes |
+| Voice was the preferred input, and poor recognition frustrated users of existing robots | Optional spoken replies and voice input, with typing always available |
+| Writer's block and getting started were common pain points | "I'm stuck" and "Break down" turn a task into a first step that takes under 5 minutes |
 
----
+## Designed for neurodivergent users
 
-## How to Run
+Many people who want a desk buddy have ADHD, autism or dyslexia, so Emi follows calm-design patterns from apps like Finch, Tiimo and Goblin Tools, and from W3C's cognitive accessibility guidance:
 
-Follow these steps to run the application locally:
+- **One thing at a time.** The main screen shows one task and its next tiny step. Everything else is one tab away.
+- **Gentle setup.** Three taps: your name, how Emi talks, and your energy.
+- **Energy check-in.** Low energy gives tinier steps and shorter sessions (10, 15 or 25 minutes).
+- **Body doubling.** Emi reads beside you during a session, and a ring shows time passing.
+- **A 2-minute heads-up** before each session ends, to ease the transition.
+- **Where was I?** When you come back to the tab, Emi tells you which task and step you were on.
+- **No guilt.** No streaks, no red, and "Not now" is always an option.
+- **Brain dump.** Type everything on your mind and Emi sorts it into today and later.
+- **"Make this step smaller"** for when a step still feels too big.
+- **You control the stimulation.** Calm mode turns off motion, sound and speech. You can also change the text size and switch to the Lexend reading font.
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/SanjanaJairam/Emi-Bot.git
-   cd Emi-Bot
-   ```
-
-2. **Install Dependencies**:
-   Use pip to install the required dependencies.
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run the Application**:
-   Start the Flask server.
-   ```bash
-   python main.py
-   ```
-
-4. **Access the App**:
-   - **Home Page**: Open your web browser and navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
-   - **Calendar Page**: Access the calendar by visiting [http://127.0.0.1:5000/cal](http://127.0.0.1:5000/cal).
+Emi herself is an original character drawn in SVG, with eight moods: idle, wave, happy, sleepy, stretch, sip, focus and think.
 
 ---
 
-## Features
+## Project structure
 
-1. **Home Page**:
-   - Emi warmly welcomes users to the Task Reminder app.
-   - Simple and intuitive UI for quick access to features.
+```
+web/index.html     The Emi app (one self-contained file, built from web/src)
+web/src/           app.html, emi-svg.html (Emi), emi.css, build.py
+api/chat.js        Serverless endpoint that calls Claude with your API key
+vercel.json        Tells Vercel to serve web/ and api/
+app/, main.py      Original v1 Flask prototype
+```
 
-2. **Calendar Page**:
-   - Displays a list of upcoming events and tasks.
-   - Helps users organize their schedule effectively.
-
-3. **Smart Reminders**:
-   - **Break Reminders**: Emi reminds users to take breaks every 30 minutes (demo triggers break reminders after 5 seconds).
-   - **Eat and Sleep Reminders**:
-     - Reminder to eat is triggered 10 seconds after the tasks page is loaded (for demo purposes).
-     - Reminder to sleep is triggered 15 seconds after the tasks page is loaded (for demo purposes).
-
-4. **User-Centric Design**:
-   - Emi aims to enhance productivity while promoting well-being.
+The page calls one function, `askEmi(prompt)`. On claude.ai it uses Claude directly. On your own site it sends the prompt to `/api/chat`, which keeps the API key on the server. Tasks, points and memories are stored in each visitor's own browser.
 
 ---
 
-## Contribution
+## Deploy your own (Vercel, free tier)
 
-Contributions are welcome! Whether you have suggestions for new features, bug fixes, or UI improvements, feel free to submit a pull request or open an issue.
+1. Get an API key from https://console.anthropic.com.
+2. Go to https://vercel.com, choose **Add New → Project**, and import this GitHub repo.
+3. Under **Environment Variables**, add `ANTHROPIC_API_KEY` with your key.
+4. Click **Deploy**. Vercel gives you a link like `emi-bot.vercel.app` to share.
+
+Every push to `main` redeploys automatically. After editing anything in `web/src/`, run `python3 web/src/build.py` to rebuild `web/index.html`.
+
+Optional: set `EMI_MODEL` to choose a different Claude model (the default is a fast, low-cost model).
+
+## Run locally
+
+```bash
+npm i -g vercel
+vercel dev        # serves web/ and api/ at http://localhost:3000
+```
+
+Put `ANTHROPIC_API_KEY=...` in a `.env` file first. The `.gitignore` excludes it.
+
+Reminders, tasks, focus mode and points work without the AI. Only chat, check-ins and "Break down" need it.
+
+### Running the original Flask v1
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
 
 ---
 
 ## License
 
-This project is open-source and available under the [MIT License](https://github.com/SanjanaJairam/Emi-Bot/blob/main/LICENSE).
+Open source under the [MIT License](LICENSE).

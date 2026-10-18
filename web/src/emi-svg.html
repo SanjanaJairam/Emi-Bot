@@ -1,0 +1,114 @@
+<svg class="emi" id="emi" viewBox="0 0 240 230" data-mood="idle" role="img" aria-label="Emi the cat">
+  <defs>
+    <radialGradient id="emiGlow">
+      <stop offset="0" stop-color="#FFD166" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#FFD166" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse class="shadow" cx="120" cy="214" rx="80" ry="9"/>
+  <g class="bodyg">
+    <!-- robot antenna: Emi is a desk robot, the bulb glows -->
+    <g class="antenna">
+      <path class="stem" d="M120 76 Q117 58 124 42"/>
+      <circle class="halo" cx="124" cy="36" r="15" fill="url(#emiGlow)"/>
+      <circle class="bulb" cx="124" cy="36" r="6.5"/>
+    </g>
+    <!-- stretch paws sit behind the head -->
+    <g data-m="stretch" class="paws-up">
+      <path class="fur line" d="M66 118 Q44 84 40 52 Q38 36 52 36 Q64 38 66 54 Q72 84 92 108 Z"/>
+      <path class="fur line" d="M174 118 Q196 84 200 52 Q202 36 188 36 Q176 38 174 54 Q168 84 148 108 Z"/>
+    </g>
+    <!-- ears -->
+    <path class="fur line" d="M58 112 Q54 72 68 56 Q92 64 108 82 Z"/>
+    <path class="ear" d="M67 100 Q66 79 73 69 Q87 74 96 85 Z"/>
+    <path class="fur line" d="M182 112 Q186 72 172 56 Q148 64 132 82 Z"/>
+    <path class="ear" d="M173 100 Q174 79 167 69 Q153 74 144 85 Z"/>
+    <!-- mochi body -->
+    <path class="fur line" d="M36 162 C36 104 72 76 120 76 C168 76 204 104 204 162 C204 198 174 210 120 210 C66 210 36 198 36 162 Z"/>
+    <!-- forehead tabby stripes -->
+    <path class="stripe" d="M111 88 v10 M120 86 v12 M129 88 v10"/>
+    <!-- cheeks -->
+    <ellipse class="cheek" cx="76" cy="162" rx="12" ry="7"/>
+    <ellipse class="cheek" cx="164" cy="162" rx="12" ry="7"/>
+
+    <!-- eyes: open -->
+    <g data-m="idle wave stretch sip think" class="eyes blink">
+      <ellipse class="ink" cx="94" cy="140" rx="9" ry="11.5"/>
+      <ellipse class="ink" cx="146" cy="140" rx="9" ry="11.5"/>
+      <circle class="shine" cx="97.5" cy="135.5" r="3.4"/>
+      <circle class="shine" cx="149.5" cy="135.5" r="3.4"/>
+      <circle class="shine" cx="91" cy="145" r="1.5"/>
+      <circle class="shine" cx="143" cy="145" r="1.5"/>
+    </g>
+    <!-- eyes: looking down at a book -->
+    <g data-m="focus" class="eyes blink">
+      <ellipse class="ink" cx="94" cy="145" rx="8.5" ry="8"/>
+      <ellipse class="ink" cx="146" cy="145" rx="8.5" ry="8"/>
+      <circle class="shine" cx="96.5" cy="143" r="2.4"/>
+      <circle class="shine" cx="148.5" cy="143" r="2.4"/>
+    </g>
+    <!-- eyes: happy arcs -->
+    <path data-m="happy" class="ink-line" d="M84 143 Q94 129 104 143 M136 143 Q146 129 156 143"/>
+    <!-- eyes: sleepy -->
+    <path data-m="sleepy" class="ink-line" d="M84 141 Q94 148 104 141 M136 141 Q146 148 156 141"/>
+
+    <!-- nose -->
+    <path class="nose" d="M116 151 Q120 149 124 151 Q120 156 116 151 Z"/>
+    <!-- mouth: small w -->
+    <path data-m="idle stretch sip focus sleepy think" class="ink-line thin" d="M110 157 Q115 163 120 157 Q125 163 130 157"/>
+    <!-- mouth: open smile -->
+    <g data-m="happy wave">
+      <path class="mouth" d="M109 157 Q120 159 131 157 Q129 172 120 172 Q111 172 109 157 Z"/>
+      <path class="tongue" d="M114 166 Q120 162 126 166 Q124 171 120 171 Q116 171 114 166 Z"/>
+    </g>
+
+    <!-- paws resting -->
+    <g data-m="idle happy sleepy think">
+      <ellipse class="fur line" cx="92" cy="204" rx="16" ry="10"/>
+      <ellipse class="fur line" cx="148" cy="204" rx="16" ry="10"/>
+    </g>
+    <!-- stretch: body stays, show toe beans peeking at bottom -->
+    <g data-m="stretch">
+      <ellipse class="fur line" cx="96" cy="208" rx="13" ry="6"/>
+      <ellipse class="fur line" cx="144" cy="208" rx="13" ry="6"/>
+    </g>
+    <!-- wave -->
+    <g data-m="wave">
+      <ellipse class="fur line" cx="92" cy="204" rx="16" ry="10"/>
+      <g class="wavepaw">
+        <ellipse class="fur line" cx="198" cy="120" rx="13" ry="17"/>
+        <path class="bean" d="M193 114 h0.1 M198 111 h0.1 M203 114 h0.1"/>
+      </g>
+    </g>
+    <!-- sip: a little mug -->
+    <g data-m="sip">
+      <path class="steam" d="M150 172 q-5 -6 0 -12 M162 172 q-5 -6 0 -12"/>
+      <path class="line nofill" d="M174 188 q14 2 0 16"/>
+      <rect class="mug line" x="140" y="178" width="36" height="32" rx="8"/>
+      <path class="mug-band" d="M141 190 h34"/>
+      <ellipse class="fur line" cx="92" cy="204" rx="16" ry="10"/>
+      <ellipse class="fur line" cx="140" cy="200" rx="11" ry="9"/>
+    </g>
+    <!-- focus: an open book -->
+    <g data-m="focus">
+      <path class="book line" d="M74 192 Q97 182 120 190 Q143 182 166 192 L166 214 Q143 206 120 213 Q97 206 74 214 Z"/>
+      <path class="line nofill" d="M120 190 V213"/>
+      <path class="book-lines" d="M86 196 q12 -4 24 0 M86 203 q12 -4 24 0 M130 196 q12 -4 24 0 M130 203 q12 -4 24 0"/>
+      <ellipse class="fur line" cx="78" cy="203" rx="11" ry="9"/>
+      <ellipse class="fur line" cx="162" cy="203" rx="11" ry="9"/>
+    </g>
+
+    <!-- extras -->
+    <g data-m="sleepy" class="zzz">
+      <text x="178" y="86">z</text><text x="194" y="66">z</text><text x="210" y="46">z</text>
+    </g>
+    <g data-m="happy" class="sparkles">
+      <path d="M34 88 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4 Z"/>
+      <path d="M204 70 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 Z"/>
+      <path d="M214 140 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 Z"/>
+    </g>
+    <g data-m="think" class="dots">
+      <circle cx="180" cy="74" r="4"/><circle cx="194" cy="60" r="5.5"/><circle cx="212" cy="44" r="7"/>
+    </g>
+  </g>
+</svg>
