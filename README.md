@@ -1,4 +1,4 @@
-# Emi 🐱 — An AI Desk Companion
+# Emi 🐱: An AI Desk Companion
 
 Emi is a cat-inspired desk companion that keeps students company during long study sessions. She helps you start tasks, reminds you to rest, and stays quiet while you focus. The question behind her: how can a desk companion support productivity and well-being without becoming another distraction?
 
