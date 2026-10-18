@@ -57,7 +57,15 @@ vercel.json        Tells Vercel to serve web/ and api/
 app/, main.py      Original v1 Flask prototype
 ```
 
-The page calls one function, `askEmi(prompt)`. On claude.ai it uses Claude directly. On your own site it sends the prompt to `/api/chat`, which keeps the API key on the server. Tasks, points and memories are stored in each visitor's own browser.
+### Scripted by default, AI when you want it
+
+Emi works fully without AI. Her built-in brain covers tap-to-reply conversations (help me start, overwhelmed, plan my next hour, how am I doing), step templates for common tasks (writing, email, reading, studying, coding, slides, cleaning, meetings), scaled to your energy, and brain-dump sorting. This keeps her predictable, instant and private, and she can run on free static hosting.
+
+Turning on **Settings → Smart help** lets Claude write steps for your exact task, sort brain dumps more intelligently, and chat freely. If the AI is unavailable, Emi quietly falls back to her built-in ideas.
+
+The page calls one function, `askEmi(prompt)`. On claude.ai it uses Claude directly. On your own site it sends the prompt to `/api/chat`, which keeps the API key on the server. Tasks, stars and memories are stored in each visitor's own browser.
+
+> Without Smart help you can host `web/` anywhere static (GitHub Pages, Netlify, Vercel) with no API key.
 
 ---
 

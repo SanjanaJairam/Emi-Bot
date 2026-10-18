@@ -152,6 +152,11 @@ details[open] summary { margin-bottom: 10px; }
 .typing i:nth-child(2) { animation-delay: .2s; } .typing i:nth-child(3) { animation-delay: .4s; }
 @keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
 .send { display: flex; gap: 8px; }
+.choices { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.choices:empty { display: none; }
+.choice-btn { border: 2px solid var(--accent-soft); background: var(--surface); color: var(--accent); border-radius: 999px; padding: 10px 18px; font-family: var(--display); font-weight: 500; font-size: .98rem; min-height: 46px; text-align: right; max-width: 100%; transition: transform .12s, background .15s; }
+.choice-btn:hover { background: var(--accent-soft); }
+.choice-btn:active { transform: scale(.97); }
 .mic[aria-pressed="true"] { background: var(--butter); color: #3E2E00; }
 
 /* Tab bar */
@@ -356,6 +361,7 @@ dialog { border: 0; border-radius: 28px; box-shadow: 0 20px 60px rgba(22, 18, 44
   <section id="tab-talk" role="tabpanel" aria-label="Talk to Emi" hidden>
     <div class="card">
       <div class="log" id="log" aria-live="polite"></div>
+      <div class="choices" id="choices"></div>
       <div class="row" id="talkChips">
         <button class="small-btn" data-say="Help me start. I don't know where to begin.">Help me start</button>
         <button class="small-btn" data-say="I'm feeling overwhelmed.">I feel overwhelmed</button>
@@ -411,6 +417,10 @@ dialog { border: 0; border-radius: 28px; box-shadow: 0 20px 60px rgba(22, 18, 44
         <div class="seg" id="setSize" style="width:180px"><button type="button" data-v="s">A</button><button type="button" data-v="m" style="font-size:1.05rem">A</button><button type="button" data-v="l" style="font-size:1.25rem">A</button></div></div>
       <div class="set"><span style="font-weight:700">Reading font</span>
         <div class="seg" id="setFont" style="width:220px"><button type="button" data-v="atk">Standard</button><button type="button" data-v="lexend" style="font-family:Lexend,sans-serif">Lexend</button></div></div>
+    </div>
+    <div class="group">
+      <h3>Smart help</h3>
+      <div class="set"><label for="smartToggle">Use Claude AI<small>Steps written for your exact task, brain dump sorting, and free typing in Talk. What you type is sent to Claude. When it's off, Emi uses her built-in ideas.</small></label><input type="checkbox" class="switch" id="smartToggle"></div>
     </div>
     <div class="group">
       <h3>For demos</h3>
@@ -472,7 +482,7 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const $ = id => document.getElementById(id);
 const DEFAULT = () => ({
   name: "", empathy: 1, energy: null, energyDate: "", onboard: 0,
-  demo: true, calm: false, sound: false, speak: false, size: "m", font: "atk", remind: "quiet",
+  demo: true, calm: false, sound: false, speak: false, size: "m", font: "atk", remind: "quiet", smart: false,
   memories: [],
   tasks: [
     { id: uid(), title: "Build robot for HRI", done: false, later: false, example: true, steps: [] },
@@ -563,7 +573,7 @@ function addTask(title, opts = {}) {
   S.tasks.push(t); save(); return t;
 }
 function completeTask(t) {
-  t.done = true; save();
+  t.done = true; t.doneAt = Date.now(); save();
   say(pick([`Done: ${t.title}.`, `You finished "${t.title}"! Nice work.`, `You finished "${t.title}". That took effort, and you did it. Take a breath before the next thing.`]), "happy");
   setTimeout(() => { if (!prompting && !S.session) setMood("idle"); }, 4000);
   renderAll();
@@ -581,6 +591,10 @@ const STEP_STYLE = {
   good: "Energy is good. Make 3 or 4 clear steps.",
 };
 async function breakDown(t, btn) {
+  if (!S.smart) { scriptedBreakDown(t); return; }
+  return aiBreakDown(t, btn);
+}
+async function aiBreakDown(t, btn) {
   if (btn) { btn.disabled = true; btn.textContent = "Thinking…"; }
   setMood("think");
   try {
@@ -593,11 +607,12 @@ Respond with ONLY JSON: {"steps": ["..."], "cheer": "one short, kind sentence"}`
     if (!steps.length) throw { code: "empty" };
     t.steps = steps.map(s => ({ text: s.trim(), done: false })); save();
     say(r.cheer || "Here's your first tiny step. Just that one.", "happy");
-  } catch (e) { say(aiError(e), "sleepy"); }
+  } catch (e) { scriptedBreakDown(t, FALLBACK_NOTE); return; }
   renderAll();
 }
 async function makeSmaller(t, step, btn) {
-  btn.disabled = true; btn.textContent = "Thinking…"; setMood("think");
+  if (!S.smart) { scriptedSmaller(t, step); return; }
+  if (btn) btn.disabled = true; if (btn) btn.textContent = "Thinking…"; setMood("think");
   try {
     const r = parseJSON(await askEmi(`A student feels stuck on this step. Split it into 2 or 3 even smaller, literal steps, each under 3 minutes and under 10 words, starting with a verb.
 Task: "${t.title}"
@@ -608,7 +623,7 @@ Respond with ONLY JSON: {"steps": ["..."]}`));
     const i = t.steps.indexOf(step);
     t.steps.splice(i, 1, ...parts.map(s => ({ text: s.trim(), done: false }))); save();
     say("Smaller now. Just do the first one.", "idle");
-  } catch (e) { say(aiError(e), "sleepy"); }
+  } catch (e) { scriptedSmaller(t, step, FALLBACK_NOTE); return; }
   renderAll();
 }
 
@@ -907,8 +922,16 @@ function addMsg(role, text) {
 }
 function renderTalk() {
   $("log").innerHTML = "";
-  if (!S.chat.length) addMsg("emi-m", `Hi${S.name ? " " + S.name : ""}! You can tell me what you're working on, ask for help starting, or just tell me how you feel.`);
   S.chat.slice(-30).forEach(m => addMsg(m.role === "user" ? "me" : "emi-m", m.text));
+  $("talkChips").hidden = !S.smart; $("sendForm").hidden = !S.smart;
+  $("choices").innerHTML = "";
+  if (!S.smart) {
+    const n = NODES.root(); addMsg("emi-m", (S.chat.length ? "" : `Hi${S.name ? " " + S.name : ""}! `) + n.text); showChoices(n.opts);
+  } else if (!S.chat.length) {
+    addMsg("emi-m", `Hi${S.name ? " " + S.name : ""}! Tell me what you're working on, ask for help starting, or tell me how you feel.`);
+  }
+  $("aiStatus").textContent = S.smart ? "Smart help is on. What you type here is sent to Claude to write Emi's replies."
+    : "Want to type to Emi freely? Turn on Smart help in Settings.";
 }
 const TONE = [
   "Be brief and factual: one or two short sentences. No emotional commentary unless they ask.",
@@ -966,14 +989,16 @@ async function talk(text, extra) {
     }
     save(); renderList();
   } catch (e) {
-    t.className = "msg note"; t.textContent = aiError(e);
+    t.className = "msg note"; t.textContent = aiError(e) + " You can use the buttons below instead.";
     if (!prompting) setMood("sleepy");
+    renderChoices("root");
   } finally { busy = false; setBusy(false); }
 }
 function setBusy(b) { $("sendBtn").disabled = b; document.querySelectorAll("#talkChips button").forEach(x => x.disabled = b); }
 
 async function brainDump() {
   const txt = $("dumpInput").value.trim(); if (!txt) return;
+  if (!S.smart) { scriptedDump(txt); return; }
   const btn = $("dumpBtn"); btn.disabled = true; btn.textContent = "Sorting…"; setMood("think");
   try {
     const r = parseJSON(await askEmi(`Turn this messy brain dump into a short list of clear tasks. Merge duplicates. Each task starts with a verb and is under 10 words. Mark tasks that are clearly not for today as later.
@@ -984,9 +1009,129 @@ Respond with ONLY JSON: {"today": ["..."], "later": ["..."], "cheer": "one short
     a.slice(0, 12).forEach(x => addTask(x)); b.slice(0, 12).forEach(x => addTask(x, { later: true }));
     $("dumpInput").value = ""; $("dump").open = false;
     say(r.cheer || `I sorted that into ${a.length + b.length} tasks.`, "happy");
-  } catch (e) { say(aiError(e), "sleepy"); }
+  } catch (e) { btn.disabled = false; btn.textContent = "Turn this into tasks"; scriptedDump(txt, FALLBACK_NOTE); return; }
   btn.disabled = false; btn.textContent = "Turn this into tasks";
   renderAll();
+}
+
+/* ================= Built-in brain: works with no AI at all ================= */
+const FALLBACK_NOTE = "My smart help isn't available right now, so I used my built-in ideas.";
+const TEMPLATES = [
+  { re: /\b(e-?mails?|reply|respond|message|text|dm|follow[- ]?up|write back)\b/i,
+    low: ["Open your inbox", "Find the email", "Read it once", "Write one sentence that answers the main question", "Add a hello and a thank you", "Press send"],
+    ok: ["Open the email and read it", "Write the main answer in one or two sentences", "Add a greeting and a sign-off", "Read it once, then send"],
+    good: ["Read the email and note what they need", "Write and send your reply", "Add any follow-up to your list"] },
+  { re: /\b(slides?|presentation|deck|poster|talk|pitch)\b/i,
+    low: ["Open a blank slide deck", "Type the title on slide one", "Make one slide per main idea, titles only", "Add one line to the first slide", "Save the file"],
+    ok: ["Open the deck", "Write slide titles for the main points", "Fill in the first two slides", "Add one picture or chart", "Save the file"],
+    good: ["Outline the story slide by slide", "Fill in all the slide content", "Do one practice run out loud"] },
+  { re: /\b(study|exams?|tests?|quiz|revise|revision|homework|assignment|problem sets?|pset|flashcards|lecture)\b/i,
+    low: ["Get your notes or materials out", "Pick one topic", "Read one page of notes", "Answer one practice question", "Write down one thing you're unsure about"],
+    ok: ["Gather your notes", "Choose one topic to cover", "Review that topic for 10 minutes", "Try three practice questions"],
+    good: ["List the topics to cover", "Work through the first two topics", "Test yourself on what you covered"] },
+  { re: /\b(code|coding|debug|bugs?|implement|script|program|deploy|robot|app|function|api|website)\b/i,
+    low: ["Open your code editor", "Open the file you need", "Read the error or the part to change", "Write one comment saying what to do next", "Make one small change", "Run it once"],
+    ok: ["Open the project and the right file", "Write down what should happen", "Make the smallest change that moves it forward", "Run it and check the result", "Save or commit your progress"],
+    good: ["Write a short plan of the changes", "Build the first piece", "Run and test it", "Commit your progress"] },
+  { re: /\b(clean|tidy|laundry|dishes|room|organi[sz]e|vacuum|trash|groceries|shopping|cook)\b/i,
+    low: ["Stand up", "Pick up five things and put them away", "Throw away any trash you can see", "Set a 5-minute timer and keep going", "Stop when the timer ends. That counts."],
+    ok: ["Pick one area to start", "Put away ten things", "Wipe one surface", "Take out anything that needs to go"],
+    good: ["Clear the biggest area first", "Put everything back in its place", "Finish with a quick wipe-down"] },
+  { re: /\b(meeting|office hours|call|prep|prepare|interview|appointment|advisor)\b/i,
+    low: ["Check the time in your calendar", "Open any notes for it", "Write one question you want to ask", "Write one thing you want to share", "Set a reminder 10 minutes before"],
+    ok: ["Check the time and the link or room", "Look over your notes", "Write two questions or updates", "Set a reminder"],
+    good: ["Review what you need to cover", "Write your talking points", "Gather any files to share"] },
+  { re: /\b(read|reading|article|book|pages|papers? to read)\b/i,
+    low: ["Open the reading", "Read only the title and first paragraph", "Look at the headings", "Read one section", "Write one sentence about what you learned"],
+    ok: ["Skim the headings and figures", "Read the introduction", "Read one main section", "Write three short notes"],
+    good: ["Skim the whole thing first", "Read the key sections closely", "Write a short summary in your own words"] },
+  { re: /\b(write|draft|essay|paper|intro|introduction|report|thesis|chapter|abstract|review|blog|proposal|statement|letter|summary)\b/i,
+    low: ["Open the document", "Read the last sentence you wrote", "Write one messy sentence about the main idea", "Write two more sentences, typos allowed", "List three points you want to make", "Save the file"],
+    ok: ["Open the document and read the last paragraph", "List three points you want to make", "Write a messy first sentence for each point", "Turn the first point into a short paragraph", "Save and note where to start next time"],
+    good: ["Outline the main points in a short list", "Draft the first section without editing", "Draft the next section", "Read it once and fix only big problems"] },
+];
+const GENERIC = {
+  low: ["Put what you need for this in front of you", "Say what 'done' looks like in one sentence", "Do the very first tiny bit", "Do one more small bit", "Check how it's going"],
+  ok: ["Gather what you need", "Write what 'done' looks like", "Do the first small part", "Do the next part", "Check your progress"],
+  good: ["Plan the main parts", "Do the first part", "Do the rest", "Check that it's done"],
+};
+function templateSteps(title) { const tp = TEMPLATES.find(x => x.re.test(title)) || GENERIC; return tp[S.energy || "ok"]; }
+function scriptedBreakDown(t, note) {
+  t.steps = templateSteps(t.title).map(x => ({ text: x, done: false })); save();
+  say(note || pick(["Steps ready. Start with the first.", "Here are some tiny steps. Just the first one for now.", "I made the steps small. You only need to do the first one."]), "happy");
+  renderAll();
+}
+function scriptedSmaller(t, step, note) {
+  const lower = step.text.charAt(0).toLowerCase() + step.text.slice(1);
+  const parts = ["Set a 2-minute timer", `Do only the first part of: ${lower}`, "Check it off, even if it isn't perfect"];
+  t.steps.splice(t.steps.indexOf(step), 1, ...parts.map(x => ({ text: x, done: false }))); save();
+  say(note || "Smaller now. Just the 2-minute timer first.", "idle");
+  renderAll();
+}
+const LATER_RE = /\b(later|tomorrow|next (week|month)|someday|eventually|weekend|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
+function scriptedDump(txt, note) {
+  const seen = new Set(); let a = 0, b = 0;
+  txt.split(/\n|;|,|\.\s|•|\band then\b|\balso\b/i)
+    .map(x => x.replace(/^[\s\-*•\d.)]+/, "").trim()).filter(x => x.length > 1)
+    .forEach(x => {
+      const k = x.toLowerCase(); if (seen.has(k) || seen.size >= 20) return; seen.add(k);
+      const title = (x.charAt(0).toUpperCase() + x.slice(1)).slice(0, 80);
+      const later = LATER_RE.test(x); addTask(title, { later }); later ? b++ : a++;
+    });
+  $("dumpInput").value = ""; $("dump").open = false;
+  say(note || `I sorted that into ${a} for today${b ? ` and ${b} for later` : ""}.`, "happy");
+  renderAll();
+}
+
+/* Tap-to-reply conversations */
+function doneToday() { const d = today(); return S.tasks.filter(t => t.done && t.doneAt && dayKey(new Date(t.doneAt)) === d).length; }
+const goNow = fn => () => { switchTab("now"); fn(); };
+const NODES = {
+  root: () => ({ text: pick(["What do you need?", "What would help right now?", "I'm here. What would help right now?"]), mood: "wave",
+    opts: [["Help me start", "start"], ["I feel overwhelmed", "overwhelm"], ["Plan my next hour", "plan"], ["How am I doing?", "doing"]] }),
+  start: () => ({ text: "Let's find a tiny way in. Which feels closest?", mood: "think",
+    opts: [["I don't know where to begin", "begin"], ["It feels too big", "begin"], ["I keep getting distracted", "distract"]] }),
+  begin: () => {
+    const t = current();
+    if (!t) return { text: "Add one thing you'd like to do in My list, and I'll break it into tiny steps.", mood: "idle", opts: [["Open my list", () => switchTab("list")]] };
+    if (!t.steps.length) t.steps = templateSteps(t.title).map(x => ({ text: x, done: false })), save(), renderAll();
+    const st = nextStep(t);
+    return { text: st ? `Let's start "${t.title}" with one tiny step: ${st.text}.` : `All the steps for "${t.title}" are done. You can mark it finished.`, mood: "happy",
+      opts: [[`Start ${focusLen()} min together`, goNow(startFocus)], ["Make it even smaller", () => { if (st) { scriptedSmaller(t, st); switchTab("now"); } }]] };
+  },
+  distract: () => ({ text: "Let's work side by side. I'll read my book and keep you company. Nudges stay quiet while we work.", mood: "focus",
+    opts: [[`Start ${focusLen()} min together`, goNow(startFocus)], ["I need a break first", goNow(() => startBreak(5))]] }),
+  overwhelm: () => ({ text: pick(["That's a lot. Let's breathe once: in for 4, out for 4.", "That sounds like a lot. Let's take one slow breath together. In, and out.", "I'm right here. That sounds really heavy. Let's take one slow breath together. In, and out."]), mood: "comfort",
+    opts: [["Okay, I breathed", "overwhelm2"], ["It's more than work", "heavy"]] }),
+  overwhelm2: () => ({ text: "Thank you. Now we pick just one thing. Everything else can wait safely in your list.", mood: "comfort",
+    opts: [["Show me one thing", () => switchTab("now")], ["I need a break", goNow(() => startBreak(5))]] }),
+  heavy: () => ({ text: "Thank you for telling me. I'm a robot cat, so I can't help the way a person can. Talking to someone you trust, like a friend, family member or counselor, can really help. If you're in danger or crisis, please contact your local emergency number or a crisis line.", mood: "comfort",
+    opts: [["Okay", "root"]] }),
+  plan: () => {
+    const t = current(), n = focusLen();
+    if (!t) return { text: "Add one task in My list first, then I can make a gentle plan.", mood: "idle", opts: [["Open my list", () => switchTab("list")]] };
+    return { text: `Here's a gentle plan for the next hour:\n1. ${n} min on "${t.title}" with me\n2. A 5 min break\n3. ${n} min more\n4. A longer rest`, mood: "happy",
+      opts: [["Start part 1", goNow(startFocus)], ["Pick a different task", () => { cycleTask(); runNode("plan"); return "handled"; }]] };
+  },
+  doing: () => {
+    const st = S.stars[today()] || 0, d = doneToday();
+    return { text: `Today you've added ${st} ${st === 1 ? "star" : "stars"} to your jar and finished ${d} ${d === 1 ? "task" : "tasks"}. Showing up counts too.`, mood: "love",
+      opts: [["Thanks, Emi", "root"]] };
+  },
+};
+function runNode(id, silentUser) {
+  const n = NODES[id](); S.chat.push({ role: "emi", text: n.text }); addMsg("emi-m", n.text); save();
+  if (!prompting) { setMood(n.mood); $("bubble").textContent = n.text.split("\n")[0]; }
+  showChoices(n.opts);
+}
+function renderChoices(id, fresh) { runNode(id); }
+function showChoices(opts) {
+  const box = $("choices"); box.innerHTML = "";
+  opts.forEach(([label, go]) => box.append(h("button", { class: "choice-btn", onclick: () => {
+    S.chat.push({ role: "user", text: label }); addMsg("me", label); save();
+    box.innerHTML = "";
+    if (typeof go === "string") runNode(go); else if (go() !== "handled") showChoices([["Talk about something else", "root"]]);
+  } }, label)));
 }
 
 /* ================= Voice input (works where the mic is allowed) ================= */
@@ -1023,7 +1168,7 @@ function segInit(id, key, cast) {
 let paints = [];
 function openSettings() {
   $("nameInput").value = S.name;
-  ["calm", "sound", "speak", "demo"].forEach(k => $(k + "Toggle").checked = S[k]);
+  ["calm", "sound", "speak", "demo", "smart"].forEach(k => $(k + "Toggle").checked = S[k]);
   const g = $("nudgeSet"); g.querySelectorAll(".set").forEach(x => x.remove());
   S.nudges.forEach(n => {
     const sw = h("input", { type: "checkbox", class: "switch", id: "nsw-" + n.id, "aria-label": n.label + " on or off" }); sw.checked = n.on;
@@ -1041,7 +1186,8 @@ $("settingsBtn").onclick = openSettings;
 $("settingsForm").addEventListener("submit", () => {
   S.name = $("nameInput").value.trim();
   const wasDemo = S.demo;
-  ["calm", "sound", "speak", "demo"].forEach(k => S[k] = $(k + "Toggle").checked);
+  const wasSmart = S.smart;
+  ["calm", "sound", "speak", "demo", "smart"].forEach(k => S[k] = $(k + "Toggle").checked);
   S.nudges.forEach(n => {
     const v = parseInt($("nmin-" + n.id).value, 10); if (v >= 5 && v <= 240) n.every = v;
     const on = $("nsw-" + n.id).checked; if (on && !n.on) n.last = Date.now(); n.on = on;
@@ -1049,6 +1195,7 @@ $("settingsForm").addEventListener("submit", () => {
   });
   if (S.session && wasDemo !== S.demo) S.session = null;
   save(); applyPrefs(); renderAll();
+  if (wasSmart !== S.smart) renderTalk();
 });
 $("resetBtn").onclick = () => $("resetConfirm").hidden = false;
 $("resetNo").onclick = () => $("resetConfirm").hidden = true;
@@ -1096,5 +1243,5 @@ function greet() {
 if (S.session && S.session.end <= Date.now()) S.session = null;
 applyPrefs(); renderAll(); greet(); renderTalk();
 setInterval(tick, 1000);
-getSample().then(s => { $("aiStatus").textContent = s ? "" : "Emi's AI connects through your own server when deployed."; });
+
 </script>
