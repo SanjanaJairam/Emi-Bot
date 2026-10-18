@@ -1,0 +1,91 @@
+/* Emi character */
+.emi { width: 100%; height: auto; overflow: visible; display: block; }
+.emi [hidden] { display: none; }
+.emi .fur { fill: var(--cat-fur); }
+.emi .line { stroke: var(--cat-line); stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+.emi .nofill { fill: none; }
+.emi .ear { fill: var(--cat-ear); }
+.emi .stripe { stroke: var(--cat-stripe); stroke-width: 4.5; stroke-linecap: round; fill: none; }
+.emi .cheek { fill: var(--cat-cheek); opacity: .75; }
+.emi .ink { fill: var(--cat-line); }
+.emi .shine { fill: #FFFFFF; }
+.emi .ink-line { stroke: var(--cat-line); stroke-width: 4.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.emi .ink-line.thin { stroke-width: 3.5; }
+.emi .nose { fill: var(--cat-line); }
+.emi .mouth { fill: var(--cat-line); }
+.emi .tongue { fill: var(--cat-cheek); }
+.emi .shadow { fill: var(--cat-shadow); }
+.emi .stem { stroke: var(--cat-line); stroke-width: 4; fill: none; stroke-linecap: round; }
+.emi .bulb { fill: #FFD166; stroke: var(--cat-line); stroke-width: 3; }
+.emi .bean { stroke: var(--cat-cheek); stroke-width: 5; stroke-linecap: round; }
+.emi .mug { fill: var(--cat-ear); }
+.emi .mug-band { stroke: #FFFFFF; stroke-width: 4; opacity: .7; }
+.emi .steam { stroke: var(--cat-line); stroke-width: 3; fill: none; stroke-linecap: round; opacity: .35; }
+.emi .book { fill: #FFFFFF; }
+.emi .book-lines { stroke: var(--cat-ear); stroke-width: 3; fill: none; stroke-linecap: round; }
+.emi .zzz text { font-family: var(--display); font-weight: 800; fill: var(--cat-line); opacity: .6; }
+.emi .zzz text:nth-child(1) { font-size: 18px; } .emi .zzz text:nth-child(2) { font-size: 22px; } .emi .zzz text:nth-child(3) { font-size: 26px; }
+.emi .sparkles path { fill: #FFD166; stroke: var(--cat-line); stroke-width: 2; stroke-linejoin: round; }
+.emi .dots circle { fill: var(--cat-fur); stroke: var(--cat-line); stroke-width: 3; }
+
+/* motion */
+.emi .bodyg { transform-origin: 120px 210px; animation: emi-breathe 4.5s ease-in-out infinite; }
+.emi .blink { transform-box: fill-box; transform-origin: center; animation: emi-blink 5.5s infinite; }
+.emi .halo { animation: emi-glow 2.8s ease-in-out infinite; }
+.emi[data-mood="happy"] .bodyg { animation: emi-hop 1.4s ease-in-out infinite; }
+.emi[data-mood="stretch"] .bodyg { animation: emi-stretch 3s ease-in-out infinite; }
+.emi[data-mood="think"] .eyes { transform: translateY(-4px); }
+.emi[data-mood="think"] .halo { animation-duration: .9s; }
+.emi[data-mood="sleepy"] .bodyg { animation-duration: 6.5s; }
+.emi .wavepaw { transform-origin: 188px 140px; animation: emi-wave 1.1s ease-in-out infinite; }
+.emi .zzz text { animation: emi-float 3s ease-in-out infinite; }
+.emi .zzz text:nth-child(2) { animation-delay: .5s; } .emi .zzz text:nth-child(3) { animation-delay: 1s; }
+.emi .steam { animation: emi-steam 2.6s ease-in-out infinite; }
+.emi .sparkles path { transform-box: fill-box; transform-origin: center; animation: emi-twinkle 1.6s ease-in-out infinite; }
+.emi .sparkles path:nth-child(2) { animation-delay: .4s; } .emi .sparkles path:nth-child(3) { animation-delay: .8s; }
+@keyframes emi-breathe { 50% { transform: scale(1.018, .982); } }
+@keyframes emi-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@keyframes emi-glow { 50% { opacity: .35; } }
+@keyframes emi-hop { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-9px) scale(.99, 1.02); } 55% { transform: translateY(0) scale(1.03, .97); } }
+@keyframes emi-stretch { 50% { transform: scale(.97, 1.07); } }
+@keyframes emi-wave { 50% { transform: rotate(-18deg); } }
+@keyframes emi-float { 50% { transform: translateY(-5px); opacity: .25; } }
+@keyframes emi-steam { 50% { opacity: .1; transform: translateY(-3px); } }
+@keyframes emi-twinkle { 50% { transform: scale(.7); } }
+.emi .noodle { stroke: #F5C451; stroke-width: 5; fill: none; stroke-linecap: round; }
+.emi .bowl { fill: #FF9F8A; }
+.emi .bowl-band { stroke: #FFFFFF; stroke-width: 4; opacity: .6; stroke-linecap: round; }
+.emi .heart { fill: #FF8FB1; }
+.emi .hearts path { fill: #FF8FB1; stroke: var(--cat-line); stroke-width: 1.5; }
+.emi .blush-plus ellipse { fill: var(--cat-cheek); opacity: .9; }
+
+/* squishier happy bounce */
+.emi[data-mood="happy"] .bodyg, .emi[data-mood="love"] .bodyg { animation: emi-squish 1.3s cubic-bezier(.3,.7,.4,1) infinite; }
+@keyframes emi-squish {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  15% { transform: translateY(0) scale(1.08, .9); }
+  40% { transform: translateY(-14px) scale(.94, 1.07); }
+  65% { transform: translateY(0) scale(1.06, .93); }
+  80% { transform: translateY(0) scale(.98, 1.02); }
+}
+/* slurp */
+.emi[data-mood="eat"] .bodyg { animation: emi-chew .7s ease-in-out infinite; }
+.emi[data-mood="eat"] .noodle { animation: emi-slurp .7s ease-in-out infinite; }
+@keyframes emi-chew { 50% { transform: scale(1.025, .975); } }
+@keyframes emi-slurp { 50% { transform: translateY(-3px); } }
+/* sleepy head nod */
+.emi[data-mood="sleepy"] .bodyg { animation: emi-nod 4s ease-in-out infinite; }
+@keyframes emi-nod { 0%, 100% { transform: rotate(0) translateY(0); } 45% { transform: rotate(3deg) translateY(3px); } 60% { transform: rotate(-1deg) translateY(-1px); } }
+/* comfort: slow, gentle sway */
+.emi[data-mood="comfort"] .bodyg { animation: emi-sway 3.6s ease-in-out infinite; }
+@keyframes emi-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+.emi .heart { transform-box: fill-box; transform-origin: center; animation: emi-beat 1.8s ease-in-out infinite; }
+@keyframes emi-beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.1); } 30% { transform: scale(.97); } 45% { transform: scale(1.06); } }
+/* floating hearts */
+.emi .hearts path { transform-box: fill-box; transform-origin: center; animation: emi-heart-up 2.2s ease-out infinite; }
+.emi .hearts path:nth-child(2) { animation-delay: .6s; } .emi .hearts path:nth-child(3) { animation-delay: 1.2s; }
+@keyframes emi-heart-up { 0% { transform: translateY(6px) scale(.6); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-18px) scale(1.1); opacity: 0; } }
+/* tap wiggle */
+.emi.wiggle { animation: emi-wiggle .6s ease-in-out; transform-origin: 50% 90%; }
+@keyframes emi-wiggle { 0%, 100% { transform: rotate(0) scale(1); } 20% { transform: rotate(-6deg) scale(1.04, .96); } 45% { transform: rotate(5deg) scale(.97, 1.03); } 70% { transform: rotate(-3deg); } }
+@media (prefers-reduced-motion: reduce) { .emi, .emi * { animation: none !important; } }
