@@ -17,7 +17,7 @@ OUT = SRC.parent / "index.html"
 
 STYLES = ["css/app.css", "emi/emi.css"]
 SCRIPTS = [  # order matters: later files use earlier ones at start-up
-    "js/util.js", "js/state.js", "js/ai.js", "js/emi.js", "js/tasks.js", "js/brain.js",
+    "js/util.js", "js/state.js", "js/ai.js", "js/emi.js", "js/care.js", "js/tasks.js", "js/brain.js",
     "js/smart.js", "js/sessions.js", "js/nudges.js", "js/now.js", "js/list.js",
     "js/talk.js", "js/settings.js", "js/main.js",
 ]

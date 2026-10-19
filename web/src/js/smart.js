@@ -48,10 +48,16 @@ Respond with ONLY JSON: {"steps": ["..."]}`);
   } catch { builtInSmaller(t, step, FALLBACK_NOTE); }
 }
 
+/* Anything in a brain dump that isn't a task (signs of crisis, harsh self-talk) never becomes
+   a task and is never sent to Claude. Emi answers it kindly instead (see care.js). */
 async function brainDump() {
-  const text = $("dumpInput").value.trim();
-  if (!text) return;
-  if (!S.smart) return builtInDump(text);
+  const raw = $("dumpInput").value.trim();
+  if (!raw) return;
+  const scan = careScan(raw);
+  const text = scan.restText;
+  const afterCare = () => { if (scan.crisis.length) showSupport(); else if (scan.harsh.length) careHarsh(); };
+  if (!text) { closeDump(); renderAll(); return scan.crisis.length || scan.harsh.length ? afterCare() : undefined; }
+  if (!S.smart) { builtInDump(text); return afterCare(); }
   const restore = setBusyButton($("dumpBtn"), "Sorting…"); setMood("think");
   try {
     const r = await askClaudeJSON(`Turn this messy brain dump into a short list of clear tasks. Merge duplicates. Each task starts with a verb and is under 10 words. Mark tasks that are clearly not for today as later.
@@ -65,5 +71,5 @@ Respond with ONLY JSON: {"today": ["..."], "later": ["..."], "cheer": "one short
     say(r.cheer || `I sorted that into ${forToday.length + forLater.length} tasks.`, "happy");
     renderAll();
   } catch { builtInDump(text, FALLBACK_NOTE); }
-  finally { restore(); }
+  finally { restore(); afterCare(); }
 }

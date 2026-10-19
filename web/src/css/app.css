@@ -119,6 +119,15 @@ button { cursor: pointer; }
 .bubble-actions:empty, .quiet:empty { display: none; }
 .quiet { padding: 5px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--muted); font-size: .8rem; font-weight: 700; text-align: center; }
 
+/* ---------- Support card (care.js) ---------- */
+.care { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; border-radius: 24px;
+  background: var(--surface); box-shadow: var(--shadow); border: 2px solid var(--accent-soft); text-align: left; }
+.care[hidden] { display: none; }
+.care-title { font-size: 1.15rem; }
+.care-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.care-list li { padding: 10px 14px; border-radius: 14px; background: var(--bg); line-height: 1.5; }
+.care a { color: var(--accent); font-weight: 700; }
+
 /* ---------- Buttons ---------- */
 .btn {
   min-height: 52px; padding: 12px 22px; border: 0; border-radius: 999px;

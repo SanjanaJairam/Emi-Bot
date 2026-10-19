@@ -82,6 +82,8 @@ function wireEvents() {
 
   $("addForm").onsubmit = e => {
     e.preventDefault();
+    const care = careCheck($("addInput").value);
+    if (care !== "none") { $("addInput").value = ""; return care === "crisis" ? showSupport() : careHarsh(); }
     if (addTask($("addInput").value)) { $("addInput").value = ""; renderAll(); }
   };
   $("dumpBtn").onclick = brainDump;
@@ -95,6 +97,7 @@ function wireEvents() {
   setupVoice();
 
   $("settingsBtn").onclick = openSettings;
+  $("supportBtn").onclick = () => { $("settings").close(); showSupport({ noticed: false }); };
   $("settingsForm").addEventListener("submit", saveSettings);
   $("resetBtn").onclick = () => { $("resetConfirm").hidden = false; };
   $("resetNo").onclick = () => { $("resetConfirm").hidden = true; };

@@ -66,8 +66,8 @@ const TALK_FLOWS = {
   oneThing: () => ({ text: "Thank you. Now we pick just one thing. Everything else can wait safely in your list.", mood: "comfort",
     options: [["Show me one thing", () => switchTab("now")], ["I need a break", goNow(startBreak)]] }),
 
-  heavy: () => ({ text: "Thank you for telling me. I'm a robot cat, so I can't help the way a person can. Talking to someone you trust, like a friend, family member or counselor, can really help. If you're in danger or crisis, please contact your local emergency number or a crisis line.", mood: "comfort",
-    options: [["Okay", "root"]] }),
+  heavy: () => ({ text: "Thank you for telling me. I'm a robot cat, so I can't help the way a person can. Talking to someone you trust, like a friend, family member or counselor, can really help. If you're in danger or crisis, a crisis line can help right now.", mood: "comfort",
+    options: [["Show support numbers", () => showSupport({ noticed: false })], ["Okay", "root"]] }),
 
   plan: () => {
     const t = currentTask(), n = focusLen();
@@ -156,11 +156,14 @@ async function talk(text) {
   if (chatBusy) return;
   setChatBusy(true);
   logChat("user", text);
+  const care = careCheck(text);
+  if (care === "crisis") showSupport();
   const typing = addMsg("emi-m", "");
   typing.innerHTML = `<span class="typing" aria-label="Emi is thinking"><i></i><i></i><i></i></span>`;
-  if (!prompting) setMood(HEAVY_WORDS.test(text) ? "comfort" : "think");
+  if (!prompting) setMood(care !== "none" || HEAVY_WORDS.test(text) ? "comfort" : "think");
   try {
-    const r = await askClaudeJSON(chatPrompt());
+    const r = await askClaudeJSON(chatPrompt() + carePromptNote(care));
+    if (care === "crisis") { r.remember = []; r.add_tasks = []; r.suggest = "none"; }
     const reply = String(r.reply || "").trim() || "Could you say that another way?";
     typing.textContent = reply;
     S.chat.push({ role: "emi", text: reply });

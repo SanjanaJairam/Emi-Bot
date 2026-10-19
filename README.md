@@ -16,6 +16,18 @@ Emi grew out of **Desk Buddy**, a human-robot interaction design research projec
 - **People wanted reminders, not nagging.** Task reminders were the most requested feature (87.5%). By default, Emi simply sips water or stretches, and you can join in if you like. Taking care of yourself adds a star to a cozy jar, with no streaks to lose.
 - **People liked being remembered.** Emi keeps small details you share, and you can view or delete them at any time.
 
+## Looking Out for People, Without Policing Them
+
+Before adding any safety features, I audited a hate-speech classifier ([project](https://github.com/SanjanaJairam/abusive-language-detection) · [interactive explainer](https://abusive-language-detection-explain.vercel.app/)). It treated swearing as harm, missed negation, and over-flagged slang, African American English and identity words. Emi's care check is designed so it doesn't repeat those mistakes:
+
+- **Venting is always fine.** Emi never reacts to swearing or single words, only to a few clear phrases about yourself.
+- **Harsh self-talk gets a gentle reply.** "I'm so stupid" gets a kind word and an offer to find one tiny step; "I'm not stupid" gets nothing.
+- **Signs of crisis bring real people in.** Emi shows a calm card with the 988 Suicide & Crisis Lifeline, Crisis Text Line and [findahelpline.com](https://findahelpline.com) for other countries. It errs toward showing, is always dismissible, and has a "That's not what I meant" button.
+- **Nothing becomes a task by accident.** In a brain dump, anything that isn't a task is set aside: it is never added to your list and never sent to Claude.
+- **It runs on your device.** The check never blocks anything, and the support numbers are always in Settings.
+
+`node web/src/tests/care_test.js` runs 76 behavioural tests, built like the audit's checks: venting, figures of speech ("this essay is killing me"), negation, slang and AAE, identity statements and coursework must stay quiet; harsh self-talk and signs of crisis must not. A phrase list will miss things, so this supports people and doesn't replace them.
+
 ## Designing for Different Needs
 
 Many people who want a desk companion find it easy to get overwhelmed, including neurodivergent users. Drawing on Finch, Tiimo, Goblin Tools, and W3C cognitive accessibility guidance, Emi shows one task at a time, sizes steps and sessions to your energy, and offers a calm mode with no motion or sound. She is meant to work around the user, rather than expecting the user to work a certain way.
@@ -28,6 +40,7 @@ Emi runs entirely in the browser using HTML, CSS, and JavaScript, and is drawn a
 
 ```bash
 python3 web/src/build.py   # rebuild after editing web/src/
+node web/src/tests/care_test.js   # care-check tests
 npm i -g vercel
 vercel dev                 # open http://localhost:3000
 ```
